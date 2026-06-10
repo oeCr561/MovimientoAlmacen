@@ -2,16 +2,20 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Movimiento RAS - Control de Inventario Doble Nodo</title>
     <!-- Tailwind CSS para diseño moderno, responsivo y vibrante -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons para componentes visuales -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Librerías jsPDF y AutoTable para generación y exportación limpia de PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent; /* Evita el destello azul al tocar en móviles */
         }
     </style>
     <!-- Definición inmediata y global de la función de soporte para el logo oficial de Movimiento RAS -->
@@ -105,11 +109,11 @@
         };
     </script>
 </head>
-<body class="bg-rose-50/30 text-slate-800 min-h-screen flex flex-col">
+<body class="bg-rose-50/30 text-slate-800 min-h-screen flex flex-col selection:bg-rose-200">
 
     <!-- PANTALLA DE INICIO DE SESIÓN (LOGIN) -->
-    <div id="login-screen" class="fixed inset-0 bg-gradient-to-br from-rose-100 via-sky-100 to-purple-100 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-3xl shadow-2xl border-4 border-pink-400 p-6 sm:p-10 max-w-md w-full text-center space-y-6 relative overflow-hidden">
+    <div id="login-screen" class="fixed inset-0 bg-gradient-to-br from-rose-100 via-sky-100 to-purple-100 flex items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white rounded-3xl shadow-2xl border-4 border-pink-400 p-6 sm:p-10 max-w-md w-full text-center space-y-6 relative overflow-hidden my-auto">
             <!-- Detalles decorativos de fondo -->
             <div class="absolute -top-10 -right-10 w-32 h-32 bg-yellow-300/30 rounded-full blur-xl"></div>
             <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-sky-300/30 rounded-full blur-xl"></div>
@@ -132,7 +136,7 @@
                         <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
                             <i data-lucide="user" class="w-5 h-5 text-pink-500"></i>
                         </span>
-                        <select id="login-usuario" required class="pl-10 pr-4 py-3 w-full border-2 border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 text-sm font-semibold bg-white appearance-none">
+                        <select id="login-usuario" required class="pl-10 pr-4 py-3.5 w-full border-2 border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 text-sm font-semibold bg-white appearance-none">
                             <option value="" disabled selected>Selecciona tu Nombre/Rol</option>
                             <option value="Coordinador General">🌟 Coordinador General</option>
                             <option value="Encargado Almacén Chico">📦 Encargado de Almacén Chico</option>
@@ -148,7 +152,7 @@
                         <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
                             <i data-lucide="lock" class="w-5 h-5 text-pink-500"></i>
                         </span>
-                        <input type="password" id="login-pin" required placeholder="Escribe el PIN de acceso" class="pl-10 pr-4 py-3 w-full border-2 border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 text-sm font-semibold">
+                        <input type="password" id="login-pin" required placeholder="Escribe el PIN de acceso" class="pl-10 pr-4 py-3.5 w-full border-2 border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 text-sm font-semibold">
                     </div>
                 </div>
 
@@ -156,7 +160,7 @@
                     PIN incorrecto. Por favor intenta de nuevo.
                 </div>
 
-                <button type="submit" class="w-full py-3.5 bg-pink-600 hover:bg-pink-700 active:translate-y-0.5 text-white rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition shadow-lg border-b-4 border-pink-800">
+                <button type="submit" class="w-full py-4 bg-pink-600 hover:bg-pink-700 active:translate-y-0.5 text-white rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition shadow-lg border-b-4 border-pink-800">
                     <i data-lucide="log-in" class="w-5 h-5"></i>
                     Entrar al Inventario
                 </button>
@@ -174,7 +178,7 @@
                 
                 <!-- Logo Oficial de la Fundación en la cabecera -->
                 <div class="flex items-center gap-3">
-                    <div class="flex items-center" id="header-logo-container">
+                    <div class="flex items-center shrink-0" id="header-logo-container">
                         <img src="image_348347.jpg" alt="Logo Movimiento RAS" class="h-16 w-auto object-contain drop-shadow" onerror="showSvgFallback(this, 'small')">
                     </div>
                     <div>
@@ -189,9 +193,9 @@
                 </div>
 
                 <!-- Perfil del usuario activo y opción de cierre de sesión -->
-                <div class="flex items-center gap-3 bg-slate-50 p-2 rounded-2xl border border-slate-200">
-                    <div class="text-right pl-2">
-                        <p class="text-xs text-slate-500 font-bold">Sesión iniciada por:</p>
+                <div class="flex items-center gap-3 bg-slate-50 p-2 rounded-2xl border border-slate-200 w-full lg:w-auto justify-between lg:justify-start">
+                    <div class="text-left lg:text-right pl-2">
+                        <p class="text-[10px] text-slate-500 font-bold">Sesión iniciada por:</p>
                         <p id="usr-actual" class="text-sm font-black text-pink-600">Invitado</p>
                     </div>
                     <button onclick="cerrarSesion()" class="p-2.5 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-xl transition duration-150" title="Cerrar Sesión">
@@ -200,20 +204,20 @@
                 </div>
                 
                 <!-- Selector de Módulos (Navegación con código de colores del logo) -->
-                <nav class="flex bg-slate-100 p-1.5 rounded-2xl w-full lg:w-auto overflow-x-auto gap-1 border border-slate-200">
-                    <button onclick="switchTab('auditoria')" id="tab-auditoria" class="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 bg-sky-500 text-white shadow-md">
+                <nav class="flex bg-slate-100 p-1.5 rounded-2xl w-full lg:w-auto overflow-x-auto gap-1 border border-slate-200 scrollbar-none">
+                    <button onclick="switchTab('auditoria')" id="tab-auditoria" class="flex-none lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 bg-sky-500 text-white shadow-md whitespace-nowrap">
                         <span class="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
                         Chico (Auditoría)
                     </button>
-                    <button onclick="switchTab('reabastecimiento')" id="tab-reabastecimiento" class="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200">
+                    <button onclick="switchTab('reabastecimiento')" id="tab-reabastecimiento" class="flex-none lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200 whitespace-nowrap">
                         <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
                         Surtido Interno
                     </button>
-                    <button onclick="switchTab('compras')" id="tab-compras" class="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200">
+                    <button onclick="switchTab('compras')" id="tab-compras" class="flex-none lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200 whitespace-nowrap">
                         <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
                         Súper (Compras)
                     </button>
-                    <button onclick="switchTab('config')" id="tab-config" class="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200">
+                    <button onclick="switchTab('config')" id="tab-config" class="flex-none lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200 whitespace-nowrap">
                         <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
                         Catálogo
                     </button>
@@ -225,7 +229,7 @@
         <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6">
             
             <!-- Alertas y Mensajes Rápidos de Estado -->
-            <div id="toast-container" class="hidden bg-emerald-500 text-white px-4 py-3.5 rounded-2xl shadow-lg mb-6 flex justify-between items-center transition-all duration-300 border-b-4 border-emerald-700">
+            <div id="toast-container" class="hidden bg-emerald-500 text-white px-4 py-3.5 rounded-2xl shadow-lg mb-6 justify-between items-center transition-all duration-300 border-b-4 border-emerald-700">
                 <span id="toast-text" class="font-bold text-sm flex items-center gap-2">
                     <i data-lucide="check-circle" class="w-5 h-5"></i>
                     ¡Inventario guardado con éxito!
@@ -248,10 +252,10 @@
                         </div>
                         
                         <!-- Filtros rápidos por ubicación -->
-                        <div class="flex gap-2 w-full lg:w-auto overflow-x-auto py-1">
-                            <button onclick="filterUbicacion('todos')" id="btn-filtro-todos" class="px-4 py-2 rounded-xl text-xs font-bold bg-sky-500 text-white shadow-sm transition">Todos los Estantes</button>
-                            <button onclick="filterUbicacion('Almacena')" id="btn-filtro-almacena" class="px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition">📦 Almacena (General)</button>
-                            <button onclick="filterUbicacion('Mueble de Madera')" id="btn-filtro-madera" class="px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition">🪵 Mueble de Madera</button>
+                        <div class="flex gap-2 w-full lg:w-auto overflow-x-auto py-1 scrollbar-none">
+                            <button onclick="filterUbicacion('todos')" id="btn-filtro-todos" class="px-4 py-2 rounded-xl text-xs font-bold bg-sky-500 text-white shadow-sm transition whitespace-nowrap">Todos los Estantes</button>
+                            <button onclick="filterUbicacion('Almacena')" id="btn-filtro-almacena" class="px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition whitespace-nowrap">📦 Almacena (General)</button>
+                            <button onclick="filterUbicacion('Mueble de Madera')" id="btn-filtro-madera" class="px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition whitespace-nowrap">🪵 Mueble de Madera</button>
                         </div>
                     </div>
 
@@ -288,12 +292,16 @@
                             <span class="w-2 h-2 rounded-full bg-sky-500"></span>
                             Los cambios actualizan automáticamente la Orden de Surtido en tiempo real en la nube.
                         </div>
-                        <div class="flex gap-3 w-full sm:w-auto">
-                            <button onclick="confirmarRestablecer()" class="flex-1 sm:flex-none px-4 py-2.5 border border-slate-300 rounded-xl hover:bg-slate-100 text-slate-700 font-bold text-sm flex items-center justify-center gap-2 transition">
+                        <div class="flex flex-wrap gap-3 w-full sm:w-auto justify-end">
+                            <button onclick="confirmarRestablecer()" class="flex-1 sm:flex-none px-4 py-3 border border-slate-300 rounded-xl hover:bg-slate-100 text-slate-700 font-bold text-sm flex items-center justify-center gap-2 transition">
                                 <i data-lucide="rotate-ccw" class="w-4 h-4 text-slate-500"></i>
                                 Poner Todo en Cero
                             </button>
-                            <button onclick="guardarInventarioCloud()" class="flex-1 sm:flex-none px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition shadow-md border-b-4 border-sky-700">
+                            <button onclick="exportarPDF('auditoria')" class="flex-1 sm:flex-none px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition shadow">
+                                <i data-lucide="file-text" class="w-4 h-4 text-sky-400"></i>
+                                Exportar PDF
+                            </button>
+                            <button onclick="guardarInventarioCloud()" class="flex-1 sm:flex-none px-5 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition shadow-md border-b-4 border-sky-700">
                                 <i data-lucide="save" class="w-4 h-4"></i>
                                 Guardar y Sincronizar
                             </button>
@@ -313,10 +321,16 @@
                         </div>
                             <p class="text-sm text-slate-600 mt-1">Lista de lo que debes traer del <strong>Almacén Grande</strong> para rellenar el <strong>Almacén Chico</strong>.</p>
                         </div>
-                        <button onclick="completarReabastecimiento()" class="w-full lg:w-auto shrink-0 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-black text-sm flex items-center justify-center gap-2 transition shadow-md border-b-4 border-amber-700">
-                            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-                            Confirmar Traslado Listo
-                        </button>
+                        <div class="flex flex-wrap gap-2 w-full lg:w-auto">
+                            <button onclick="exportarPDF('surtido')" class="flex-1 lg:flex-none px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition shadow">
+                                <i data-lucide="file-text" class="w-4 h-4 text-amber-400"></i>
+                                Exportar PDF
+                            </button>
+                            <button onclick="completarReabastecimiento()" class="flex-1 lg:flex-none px-5 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-black text-sm flex items-center justify-center gap-2 transition shadow-md border-b-4 border-amber-700">
+                                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                                Confirmar Traslado Listo
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Resumen Estadístico Rápido con los colores del logo -->
@@ -409,7 +423,11 @@
                                 <i data-lucide="check" class="w-4 h-4 text-emerald-500"></i>
                                 Reabastecer Reserva Grande
                             </button>
-                            <button onclick="copiarListaCompras()" class="flex-1 lg:flex-none px-5 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-black text-xs flex items-center justify-center gap-1.5 transition shadow-md border-b-4 border-rose-700">
+                            <button onclick="exportarPDF('compras')" class="flex-1 lg:flex-none px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition shadow">
+                                <i data-lucide="file-text" class="w-4 h-4 text-rose-400"></i>
+                                Exportar PDF
+                            </button>
+                            <button onclick="copiarListaCompras()" class="flex-1 lg:flex-none px-5 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-black text-xs flex items-center justify-center gap-1.5 transition shadow-md border-b-4 border-rose-700">
                                 <i data-lucide="copy" class="w-4 h-4"></i>
                                 Copiar para WhatsApp
                             </button>
@@ -589,7 +607,7 @@
             { id: 30, textId: "Ajo_cabezas", nombre: "Ajo", categoria: "Especias", unidad: "Cabezas", stockObjetivo: 6, cantidadActual: 3, ubicacion: "Almacena", agotadoGrande: false },
             { id: 31, nombre: "Consomé", categoria: "Especias", unidad: "Frascos", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
             { id: 32, nombre: "Sal de Ajo", categoria: "Especias", unidad: "Frascos", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 33, nombre: "Orégano", categoria: "Especias", unidad: "Frascos", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
+            { id: 33, nombre: "Orégano", categoria: "Especias", unidad: "Frascos", stockObjetivo: 1, carrot: 1, ubicacion: "Almacena", agotadoGrande: false },
             { id: 34, nombre: "Pimienta", categoria: "Especias", unidad: "Frascos", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
             { id: 35, nombre: "Salsa Soya (Alacena)", categoria: "Salsas", unidad: "Frascos", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
             { id: 36, nombre: "Comino", categoria: "Especias", unidad: "Bolsas", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
@@ -765,6 +783,98 @@
             } else {
                 localStorage.setItem('inventario_ras', JSON.stringify(inventario));
             }
+        };
+
+        // --- SISTEMA DE EXPORTACIÓN DE PDF PROFESIONAL ---
+        window.exportarPDF = function(tipo) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Estilos del encabezado del documento
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(20);
+            doc.setTextColor(225, 29, 116); // Rosa RAS (#e11d74)
+            doc.text("FUNDACIÓN MOVIMIENTO RAS", 14, 20);
+            
+            doc.setFontSize(10);
+            doc.setTextColor(100, 116, 139);
+            doc.text("Apoyo a Niños con Cáncer • Sistema de Inventario", 14, 25);
+            
+            doc.setFont("helvetica", "normal");
+            const fecha = new Date().toLocaleString('es-MX', { timeZone: 'America/Hermosillo' });
+            const usuario = localStorage.getItem('ras_usuario_actual') || "Invitado";
+            doc.text(`Fecha de generación: ${fecha}`, 14, 32);
+            doc.text(`Generado por: ${usuario}`, 14, 37);
+            
+            let tituloReporte = "";
+            let columnas = [];
+            let filas = [];
+            
+            if (tipo === 'auditoria') {
+                tituloReporte = "Reporte de Inventario - Almacén Chico";
+                columnas = ["Producto", "Categoría", "Ubicación", "Stock Objetivo", "Cantidad Actual", "Faltante"];
+                
+                inventario.forEach(p => {
+                    const fal = p.stockObjetivo - p.cantidadActual;
+                    filas.push([
+                        p.nombre,
+                        p.categoria,
+                        p.ubicacion,
+                        p.stockObjetivo.toString(),
+                        p.cantidadActual.toString(),
+                        fal > 0 ? fal.toString() : "0"
+                    ]);
+                });
+            } else if (tipo === 'surtido') {
+                tituloReporte = "Orden de Surtido Interno (Grande a Chico)";
+                columnas = ["Producto", "Ubicación Destino", "Estatus Físico", "Cantidad a Llevar"];
+                
+                const productosNecesitados = inventario.filter(p => (p.stockObjetivo - p.cantidadActual) > 0 && !p.agotadoGrande);
+                productosNecesitados.forEach(p => {
+                    const dif = p.stockObjetivo - p.cantidadActual;
+                    filas.push([
+                        p.nombre,
+                        p.ubicacion,
+                        `${p.cantidadActual} de ${p.stockObjetivo}`,
+                        dif.toString()
+                    ]);
+                });
+            } else if (tipo === 'compras') {
+                tituloReporte = "Lista de Compras de Supermercado (Externas)";
+                columnas = ["Producto", "Categoría", "Unidad", "Falta en Chico"];
+                
+                const comprasExternas = inventario.filter(p => p.agotadoGrande && (p.stockObjetivo - p.cantidadActual) > 0);
+                comprasExternas.forEach(p => {
+                    const dif = p.stockObjetivo - p.cantidadActual;
+                    filas.push([
+                        p.nombre,
+                        p.categoria,
+                        p.unidad,
+                        dif.toString()
+                    ]);
+                });
+            }
+            
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.setTextColor(30, 41, 59);
+            doc.text(tituloReporte, 14, 46);
+            
+            // Generación de tabla profesional con autoTable
+            doc.autoTable({
+                startY: 50,
+                head: [columnas],
+                body: filas,
+                theme: 'striped',
+                headStyles: { fillColor: [225, 29, 116] }, // Color Rosa RAS oficial
+                styles: { fontSize: 9, cellPadding: 3 },
+                margin: { left: 14, right: 14 }
+            });
+            
+            // Guardar documento
+            const nombreArchivo = `${tituloReporte.replace(/ /g, "_")}.pdf`;
+            doc.save(nombreArchivo);
+            showToast(`📄 PDF "${tituloReporte}" descargado con éxito.`);
         };
 
         // --- SISTEMA MODAL PERSONALIZADO (No alerts) ---
