@@ -1,0 +1,17 @@
+{
+  "short_name": "AlmacenRAS",
+  "name": "Movimiento RAS - Inventario",
+  "icons": [
+    {
+      "src": "https://oecr561.github.io/MovimientoAlmacen/logo.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "background_color": "#e11d74",
+  "theme_color": "#e11d74",
+  "display": "standalone",
+  "orientation": "portrait"
+}
