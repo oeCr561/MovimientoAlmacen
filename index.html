@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Movimiento RAS - Control de Inventario Doble Nodo</title>
-    <!-- Tailwind CSS para diseño moderno, responsivo y vibrante -->
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons para componentes visuales -->
+
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Librerías jsPDF y AutoTable para generación y exportación limpia de PDF -->
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         body {
@@ -787,97 +787,110 @@ window.guardarSilencioso = function() {
             .catch(err => console.error("Error al sincronizar con Firebase:", err));
     }
 };   // --- SISTEMA DE EXPORTACIÓN DE PDF PROFESIONAL ---
-        window.exportarPDF = function(tipo) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            // Estilos del encabezado del documento
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(20);
-            doc.setTextColor(225, 29, 116); // Rosa RAS (#e11d74)
-            doc.text("FUNDACIÓN MOVIMIENTO RAS", 14, 20);
-            
-            doc.setFontSize(10);
-            doc.setTextColor(100, 116, 139);
-            doc.text("Apoyo a Niños con Cáncer • Sistema de Inventario", 14, 25);
-            
-            doc.setFont("helvetica", "normal");
-            const fecha = new Date().toLocaleString('es-MX', { timeZone: 'America/Hermosillo' });
-            const usuario = localStorage.getItem('ras_usuario_actual') || "Invitado";
-            doc.text(`Fecha de generación: ${fecha}`, 14, 32);
-            doc.text(`Generado por: ${usuario}`, 14, 37);
-            
-            let tituloReporte = "";
-            let columnas = [];
-            let filas = [];
-            
-            if (tipo === 'auditoria') {
-                tituloReporte = "Reporte de Inventario - Almacén Chico";
-                columnas = ["Producto", "Categoría", "Ubicación", "Stock Objetivo", "Cantidad Actual", "Faltante"];
-                
-                inventario.forEach(p => {
-                    const fal = p.stockObjetivo - p.cantidadActual;
-                    filas.push([
-                        p.nombre,
-                        p.categoria,
-                        p.ubicacion,
-                        p.stockObjetivo.toString(),
-                        p.cantidadActual.toString(),
-                        fal > 0 ? fal.toString() : "0"
-                    ]);
-                });
-            } else if (tipo === 'surtido') {
-                tituloReporte = "Orden de Surtido Interno (Grande a Chico)";
-                columnas = ["Producto", "Ubicación Destino", "Estatus Físico", "Cantidad a Llevar"];
-                
-                const productosNecesitados = inventario.filter(p => (p.stockObjetivo - p.cantidadActual) > 0 && !p.agotadoGrande);
-                productosNecesitados.forEach(p => {
-                    const dif = p.stockObjetivo - p.cantidadActual;
-                    filas.push([
-                        p.nombre,
-                        p.ubicacion,
-                        `${p.cantidadActual} de ${p.stockObjetivo}`,
-                        dif.toString()
-                    ]);
-                });
-            } else if (tipo === 'compras') {
-                tituloReporte = "Lista de Compras de Supermercado (Externas)";
-                columnas = ["Producto", "Categoría", "Unidad", "Falta en Chico"];
-                
-                const comprasExternas = inventario.filter(p => p.agotadoGrande && (p.stockObjetivo - p.cantidadActual) > 0);
-                comprasExternas.forEach(p => {
-                    const dif = p.stockObjetivo - p.cantidadActual;
-                    filas.push([
-                        p.nombre,
-                        p.categoria,
-                        p.unidad,
-                        dif.toString()
-                    ]);
-                });
-            }
-            
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(14);
-            doc.setTextColor(30, 41, 59);
-            doc.text(tituloReporte, 14, 46);
-            
-            // Generación de tabla profesional con autoTable
-            doc.autoTable({
-                startY: 50,
-                head: [columnas],
-                body: filas,
-                theme: 'striped',
-                headStyles: { fillColor: [225, 29, 116] }, // Color Rosa RAS oficial
-                styles: { fontSize: 9, cellPadding: 3 },
-                margin: { left: 14, right: 14 }
-            });
-            
-            // Guardar documento
-            const nombreArchivo = `${tituloReporte.replace(/ /g, "_")}.pdf`;
-            doc.save(nombreArchivo);
-            showToast(`📄 PDF "${tituloReporte}" descargado con éxito.`);
-        };
+       // --- SISTEMA DE EXPORTACIÓN DE PDF PROFESIONAL DE TRES TABLAS ---
+window.exportarPDF = function(tipo) {
+    const { jsPDF } = window.jspdf;
+    // Creamos el documento en formato A4
+    const doc = new jsPDF('p', 'pt', 'a4');
+    
+    // --- 1. ENCABEZADO OFICIAL DE MOVIMIENTO RAS ---
+    doc.setFillColor(225, 29, 116); // Rosa RAS (#e11d74)
+    doc.rect(0, 0, 595, 75, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("FUNDACIÓN MOVIMIENTO RAS", 35, 34);
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Apoyo a Niños con Cáncer - Sistema de Control de Inventarios", 35, 54);
+    
+    // Metadatos del Reporte
+    doc.setFontSize(9);
+    const fechaActual = new Date().toLocaleDateString('es-MX');
+    doc.text(`Fecha: ${fechaActual}`, 465, 34);
+    doc.text("Estado: Firebase Conectado", 465, 54);
 
+    // --- 2. CLASIFICACIÓN DE LOGÍSTICA (PROCESAMIENTO DE DATOS) ---
+    // Tabla 1: Inventario Completo (Todos los artículos existentes)
+    const tablaCompleta = inventario.map(p => [
+        p.id, 
+        p.nombre, 
+        p.categoria, 
+        p.cantidadActual, 
+        p.unidad
+    ]);
+    
+    // Tabla 2: Productos Faltantes (Artículos críticos que están en 0)
+    const tablaFaltantes = inventario
+        .filter(p => Number(p.cantidadActual) === 0)
+        .map(p => [p.id, p.nombre, p.categoria, p.ubicacion || 'Almacena']);
+                                
+    // Tabla 3: Orden de Surtido (Artículos cuya cantidad actual está por debajo de su stock objetivo)
+    const tablaSurtir = inventario
+        .filter(p => Number(p.cantidadActual) < Number(p.stockObjetivo))
+        .map(p => [
+            p.id, 
+            p.nombre, 
+            p.stockObjetivo, 
+            p.cantidadActual, 
+            `Llevar ${Number(p.stockObjetivo) - Number(p.cantidadActual)} ${p.unit || p.unidad}`
+        ]);
+
+    let coordsY = 110;
+
+    // --- 3. RENDERIZADO - TABLA 1: INVENTARIO GENERAL ---
+    doc.setTextColor(225, 29, 116);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("1. Inventario General Completo", 35, coordsY);
+    
+    doc.autoTable({
+        startY: coordsY + 12,
+        head: [['ID', 'Producto o Suministro', 'Categoría', 'Cant. Actual', 'Unidad']],
+        body: tablaCompleta,
+        theme: 'striped',
+        headStyles: { fillColor: [45, 55, 72] }, // Gris carbón
+        styles: { fontSize: 9, cellPadding: 5 },
+        margin: { left: 35, right: 35 }
+    });
+    
+    coordsY = doc.lastAutoTable.finalY + 30;
+
+    // --- 4. RENDERIZADO - TABLA 2: PRODUCTOS FALTANTES ---
+    doc.setTextColor(225, 29, 116);
+    doc.text("2. Productos Faltantes (Stock Crítico en Cero)", 35, coordsY);
+    
+    doc.autoTable({
+        startY: coordsY + 12,
+        head: [['ID', 'Artículo Agotado', 'Categoría', 'Ubicación Destino']],
+        body: tablaFaltantes.length > 0 ? tablaFaltantes : [['-', 'No se registran artículos en cero', '-', '-']],
+        theme: 'grid',
+        headStyles: { fillColor: [197, 48, 48] }, // Rojo Alerta
+        styles: { fontSize: 9, cellPadding: 5 },
+        margin: { left: 35, right: 35 }
+    });
+    
+    coordsY = doc.lastAutoTable.finalY + 30;
+
+    // --- 5. RENDERIZADO - TABLA 3: ORDEN DE SURTIDO INTERNO ---
+    doc.setTextColor(225, 29, 116);
+    doc.text("3. Orden de Surtido y Relleno (Pendientes de Traslado)", 35, coordsY);
+    
+    doc.autoTable({
+        startY: coordsY + 12,
+        head: [['ID', 'Producto Requerido', 'Stock Obj.', 'Cant. Actual', 'Cantidad a Mover']],
+        body: tablaSurtir.length > 0 ? tablaSurtir : [['-', 'Todo el stock se encuentra lleno', '-', '-', '-']],
+        theme: 'striped',
+        headStyles: { fillColor: [156, 66, 33] }, // Café / Naranja Logístico
+        styles: { fontSize: 9, cellPadding: 5 },
+        margin: { left: 35, right: 35 }
+    });
+
+    // --- 6. SALVA DEL ARCHIVO GENERADO ---
+    doc.save(`Reporte_Inventario_RAS_${fechaActual.replace(/\//g, '-')}.pdf`);
+};
         // --- SISTEMA MODAL PERSONALIZADO (No alerts) ---
         let callbackModal = null;
         window.showConfirmModal = function(title, description, callback) {
