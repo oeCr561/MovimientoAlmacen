@@ -636,7 +636,8 @@
             { id: 57, nombre: "Salsa Verde", categoria: "Salsas", unidad: "Pzs", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Mueble de Madera", agotadoGrande: false }
         ];
 
-        let inventario = [...DATA_INICIAL];
+      window.inventario = [...DATA_INICIAL];
+       let inventario = window.inventario;
         let user = null;
         let db = null;
         let auth = null;
@@ -776,16 +777,16 @@
             }
         };
 
-        window.guardarSilencioso = async function() {
-            if (db && auth && auth.currentUser) {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'inventario', 'actual');
-                setDoc(docRef, { items: inventario }).catch(err => console.error(err));
-            } else {
-                localStorage.setItem('inventario_ras', JSON.stringify(inventario));
-            }
-        };
-
-        // --- SISTEMA DE EXPORTACIÓN DE PDF PROFESIONAL ---
+window.guardarSilencioso = function() {
+    // Guardar copia local de seguridad en el navegador
+    localStorage.setItem('inventario_ras', JSON.stringify(inventario));
+    
+    // Subir el inventario corregido y completo a Firebase Realtime Database
+    if (window.baseDeDatos) {
+        window.baseDeDatos.ref('productos').set(inventario)
+            .catch(err => console.error("Error al sincronizar con Firebase:", err));
+    }
+};   // --- SISTEMA DE EXPORTACIÓN DE PDF PROFESIONAL ---
         window.exportarPDF = function(tipo) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -914,9 +915,10 @@
                 "Eliminará los productos nuevos agregados y restablecerá el catálogo original con tus 57 productos.", 
                 () => {
                     inventario = JSON.parse(JSON.stringify(DATA_INICIAL));
+                    window.inventario = inventario;
                     guardarSilencioso();
                     renderAll();
-                    showToast("Base de datos restablecida a los valores de las fotos.");
+                 showToast("Base de datos restablecida correctamente.");
                 }
             );
         };
@@ -929,6 +931,7 @@
                     `Se removerá permanentemente este artículo del catálogo de Movimiento RAS.`, 
                     () => {
                         inventario = inventario.filter(p => p.id !== id);
+                        window.inventario = inventario;
                         guardarSilencioso();
                         renderAll();
                         showToast(`Producto "${prod.nombre}" eliminado.`);
@@ -1280,8 +1283,9 @@
                 ubicacion: ubicacion,
                 agotadoGrande: false
             };
-
+baseDeDatos.ref('productos').push(nuevoProd);
             inventario.push(nuevoProd);
+            window.inventario = inventario;
             guardarSilencioso();
             renderAll();
             
@@ -1324,7 +1328,82 @@
             container.classList.remove('flex');
         }
 
-        initFirebase();
+       
     </script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+<script>
+  // 2. CREDENCIALES: Tus llaves oficiales de conexión
+  const firebaseConfig = {
+    apiKey: "AIzaSyAzvOL45raHirjvHmRb6_3lKFcm7BQ0KQE",
+    authDomain: "movimiento-ras-74e7c.firebaseapp.com",
+    databaseURL: "https://movimiento-ras-74e7c-default-rtdb.firebaseio.com",
+    projectId: "movimiento-ras-74e7c",
+    storageBucket: "movimiento-ras-74e7c.firebasestorage.app",
+    messagingSenderId: "548240435431",
+    appId: "1:548240435431:web:833fd742992d2ca1195a42"
+  };
+
+  // 3. INICIALIZACIÓN: Creamos la variable global baseDeDatos
+  firebase.initializeApp(firebaseConfig);
+  window.baseDeDatos = firebase.database(); // La hacemos "window." para que todo tu código la vea
+
+// 4. ESCUCHADORES EN TIEMPO REAL: Traer los datos de internet
+// Sincronización completa con Firebase en tiempo real
+  window.initFirebase = function() {
+      
+     // 1. Escuchar e importar los PRODUCTOS de la nube de forma inteligente
+      baseDeDatos.ref('productos').on('value', (snapshot) => {
+          const datosNube = snapshot.val();
+          
+          // Convertimos lo que haya en la nube a un arreglo
+          const listaNube = datosNube ? Object.values(datosNube) : [];
+
+          // TRUCO: Si la nube está vacía o tiene menos productos que tu app local,
+          // usamos e imponemos el inventario base de la app para que no se borre.
+          if (listaNube.length > 1) {
+              window.inventario = listaNube;
+          } else {
+              // Si la nube está casi vacía, le subimos todo el catálogo completo de la app
+              if (window.inventario && window.inventario.length > 1) {
+                  baseDeDatos.ref('productos').set(window.inventario);
+              }
+          }
+          
+          if (typeof window.renderAll === 'function') {
+              window.renderAll();
+          }
+      });
+
+      // 2. Escuchar e importar los MOVIMIENTOS de la nube
+      baseDeDatos.ref('movimientos').on('value', (snapshot) => {
+          const datosNube = snapshot.val();
+          window.movimientos = datosNube ? Object.values(datosNube) : [];
+          
+          if (typeof window.renderTable === 'function') {
+              window.renderTable();
+          } else if (typeof window.actualizarTabla === 'function') {
+              window.actualizarTabla();
+          }
+      });
+
+      
+
+      // Escuchar Historial de Movimientos
+      baseDeDatos.ref('movimientos').on('value', (snapshot) => {
+          const datosNube = snapshot.val();
+          window.movimientos = datosNube ? Object.values(datosNube) : [];
+          if (typeof window.renderTable === 'function') {
+              window.renderTable();
+          } else if (typeof window.actualizarTabla === 'function') {
+              window.actualizarTabla();
+          }
+      });
+  };
+
+  // 5. EJECUCIÓN: Arrancamos la sincronización activa
+  initFirebase();
+</script>
 </body>
-</html>
+</html> 
