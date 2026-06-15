@@ -12,7 +12,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         body {
@@ -700,7 +700,8 @@
                     auth = getAuth(app);
                     db = getFirestore(app);
                     appId = typeof __app_id !== 'undefined' ? __app_id : 'movimiento-ras-default';
-
+                     window.dbFirestore = db; 
+                     window.currentAppId = appId;
                     const savedUsr = localStorage.getItem('ras_usuario_actual');
                     
                     onAuthStateChanged(auth, async (authUser) => {
@@ -779,10 +780,26 @@
             }
         };
 
-window.guardarSilencioso = function() {
-    // Guardar copia local de seguridad en el navegador
+window.guardarSilencioso = async function() {
+    // 1. Guardar copia local de seguridad en el navegador (Almacenamiento local)
     localStorage.setItem('inventario_ras', JSON.stringify(inventario));
     
+    // 2. Subir el inventario corregido y completo a Cloud Firestore
+    if (window.dbFirestore && window.currentAppId) {
+        try {
+            // Replicamos exactamente la misma ruta estructurada de tu onSnapshot
+            const docRef = doc(window.dbFirestore, 'artifacts', window.currentAppId, 'public', 'data', 'inventario', 'actual');
+            
+            // Guardamos el array de productos dentro del campo 'items' que espera tu lectura
+            await setDoc(docRef, { items: inventario });
+            console.log("Sincronización automática en Firestore completada con éxito.");
+        } catch (err) {
+            console.error("Error crítico al sincronizar con Cloud Firestore:", err);
+        }
+    } else {
+        console.warn("No se pudo sincronizar: Firestore o AppID no están inicializados.");
+    }
+
     // Subir el inventario corregido y completo a Firebase Realtime Database
     if (window.baseDeDatos) {
         window.baseDeDatos.ref('productos').set(inventario)
@@ -791,7 +808,7 @@ window.guardarSilencioso = function() {
 };   // --- SISTEMA DE EXPORTACIÓN DE PDF PROFESIONAL ---
        // --- SISTEMA DE EXPORTACIÓN DE PDF PROFESIONAL DE TRES TABLAS ---
 window.exportarPDF = function(tipo) {
-    const { jsPDF } = window.jspdf;
+    const { jsPDF } = window.jspdf;x
     // Creamos el documento en formato A4
     const doc = new jsPDF('p', 'pt', 'a4');
     
@@ -1362,12 +1379,11 @@ baseDeDatos.ref('productos').push(nuevoProd);
 
   // 3. INICIALIZACIÓN: Creamos la variable global baseDeDatos
   firebase.initializeApp(firebaseConfig);
-  window.baseDeDatos = firebase.database(); // La hacemos "window." para que todo tu código la vea
 
 // 4. ESCUCHADORES EN TIEMPO REAL: Traer los datos de internet
 // Sincronización completa con Firebase en tiempo real
   window.initFirebase = function() {
-      
+      z
      // 1. Escuchar e importar los PRODUCTOS de la nube de forma inteligente
       baseDeDatos.ref('productos').on('value', (snapshot) => {
           const datosNube = snapshot.val();
