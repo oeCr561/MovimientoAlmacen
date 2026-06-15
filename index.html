@@ -6,11 +6,12 @@
     <title>Movimiento RAS - Control de Inventario Doble Nodo</title>
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/png" href="logo.png">
-    
+   
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
 
     <style>
         @import url('https://fonts.googleapis.com/css?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -18,7 +19,16 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
+        /* Animación personalizada para alertas críticas parpadeantes */
+        @keyframes pulso-critico {
+            0%, 100% { border-top-color: #db2777; box-shadow: 0 0 0 0 rgba(219, 39, 119, 0.4); }
+            50% { border-top-color: #f43f5e; box-shadow: 0 0 12px 4px rgba(244, 63, 94, 0.2); }
+        }
+        .alerta-vacio {
+            animation: pulso-critico 2s infinite ease-in-out;
+        }
     </style>
+
 
     <script>
         window.showSvgFallback = function(imgElement) {
@@ -30,35 +40,38 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-pink-200">
 
+
     <div id="login-screen" class="flex-1 flex items-center justify-center p-4 min-h-screen bg-gradient-to-br from-pink-50 via-slate-50 to-sky-50">
         <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-slate-100 max-w-md w-full text-center space-y-6">
             <div class="relative w-28 h-28 sm:w-32 sm:h-32 mx-auto">
                 <img src="logo.png" alt="Logo Movimiento RAS" class="w-full h-full object-contain" onerror="window.showSvgFallback(this)">
                 <div class="hidden w-full h-full flex items-center justify-center bg-pink-100 text-pink-600 rounded-2xl font-bold text-xl">RAS</div>
             </div>
-            
+           
             <div>
-                <span class="text-xs font-bold uppercase tracking-widest text-pink-500 bg-pink-50 px-3 py-1 rounded-full">Acceso al Sistema</span>
+                <span class="text-xs font-bold uppercase tracking-widest text-pink-500 bg-pink-50 px-3 py-1 rounded-full">Acceso Seguro</span>
                 <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-2">Movimiento <span class="text-pink-600">RAS</span></h1>
                 <p class="text-slate-500 text-xs sm:text-sm mt-1">Control de Inventario Doble Almacén</p>
             </div>
 
+
             <form id="login-form" onsubmit="window.handleLogin(event)" class="space-y-4 text-left">
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">¿Quién eres?</label>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Selecciona tu Rol</label>
                     <select id="login-usuario" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 font-medium text-slate-700 text-sm">
-                        <option value="Encargado Almacén Chico">Encargado Almacén Chico</option>
-                        <option value="Coordinador General">Coordinador General</option>
+                        <option value="Encargado Almacén Chico">Encargado Almacén Chico (Solo Lectura/Surtido)</option>
+                        <option value="Coordinador General">Coordinador General (Control Total)</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Contraseña (PIN)</label>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Contraseña (PIN Personal)</label>
                     <input type="password" id="login-pin" placeholder="••••" maxlength="4" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 text-center text-lg tracking-widest font-bold">
                 </div>
-                
+               
                 <div id="login-error" class="hidden text-sm font-semibold text-pink-600 bg-pink-50 p-3 rounded-xl border border-pink-100 flex items-center gap-2">
-                    <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0"></i> PIN Incorrecto. Intenta de nuevo.
+                    <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0"></i> PIN Incorrecto para el usuario seleccionado.
                 </div>
+
 
                 <button type="submit" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 shadow-md shadow-pink-600/20 active:scale-[0.98] text-sm">
                     Entrar al Inventario
@@ -67,6 +80,7 @@
             <p class="text-[11px] sm:text-xs text-slate-400">Uniendo voluntades para apoyar a los niños con cáncer 💛</p>
         </div>
     </div>
+
 
     <div id="app-screen" class="hidden flex-1 flex-col min-h-screen">
         <header class="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm px-4 py-3">
@@ -83,12 +97,13 @@
                         <i data-lucide="log-out" class="w-5 h-5"></i>
                     </button>
                 </div>
-                
+               
                 <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl overflow-x-auto max-w-full w-full md:w-auto no-scrollbar">
                     <button onclick="window.filtrarEstante('todos')" id="btn-estante-todos" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition bg-pink-600 text-white shadow-sm">Todos los Estantes</button>
                     <button onclick="window.filtrarEstante('Almacena (General)')" id="btn-estante-general" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition text-slate-600 hover:text-sky-600">📦 Almacena (General)</button>
                     <button onclick="window.filtrarEstante('Mueble de Madera')" id="btn-estante-madera" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition text-slate-600 hover:text-sky-600">🪵 Mueble de Madera</button>
                 </div>
+
 
                 <div class="hidden md:flex items-center gap-3">
                     <div class="text-right">
@@ -102,22 +117,24 @@
             </div>
         </header>
 
+
         <main class="flex-1 max-w-7xl w-full mx-auto p-4 space-y-4">
-            
-            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm space-y-3">
+           
+            <div id="panel-agregar-producto" class="hidden bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm space-y-3">
                 <div class="flex items-center gap-2 text-pink-600 font-extrabold text-sm uppercase tracking-wider">
                     <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                    <span>Registrar Nuevo Producto</span>
+                    <span>Registrar Nuevo Producto <span class="text-[10px] bg-pink-100 text-pink-700 px-2 py-0.5 rounded-md ml-1">Admin</span></span>
                 </div>
                 <form id="form-nuevo-producto" onsubmit="window.agregarProductoManual(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
                     <input type="text" id="add-nombre" placeholder="Nombre (ej. Cloro)" required class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-pink-500 font-medium w-full">
                     <input type="text" id="add-categoria" placeholder="Categoría (ej. Limpieza)" required class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-pink-500 font-medium w-full">
                     <input type="text" id="add-unidad" placeholder="Unidad (ej. Pzs, Latas)" required class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-pink-500 font-medium w-full">
-                    
+                   
                     <select id="add-ubicacion" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-pink-500 text-slate-600 font-medium w-full">
                         <option value="Almacena (General)">📦 Almacena (General)</option>
                         <option value="Mueble de Madera">🪵 Mueble de Madera</option>
                     </select>
+
 
                     <div class="flex gap-2 w-full">
                         <input type="number" id="add-objetivo" placeholder="Obj." min="1" required class="w-20 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-center focus:outline-none focus:ring-2 focus:ring-pink-500 font-bold">
@@ -128,12 +145,13 @@
                 </form>
             </div>
 
+
             <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
                 <div class="relative w-full sm:max-w-md">
                     <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4"></i>
                     <input type="text" id="buscador" oninput="window.handleBuscar()" placeholder="Buscar producto por nombre..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-500">
                 </div>
-                
+               
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
                     <button onclick="window.exportarPDF('chico')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs py-2 px-3 rounded-xl transition shadow-sm">
                         <i data-lucide="file-text" class="w-4 h-4"></i> Reporte Chico
@@ -144,22 +162,28 @@
                 </div>
             </div>
 
+
             <div id="contenedor-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 </div>
         </main>
     </div>
 
+
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
+
         let auth, dbRealtime;
         let inventario = [];
         let filtroEstanteActual = 'todos';
         let textoBusquedaActual = '';
+        let rolUsuarioActual = 'Encargado Almacén Chico'; // Rol por defecto
+
 
         const DATA_INICIAL = [
             { id: 1, nombre: "Leche", categoria: "Lácteos", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 2, cantidadActual: 0 },
@@ -171,8 +195,9 @@
             { id: 7, nombre: "Jabón para lavar trastes", categoria: "Limpieza", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 0 }
         ];
 
+
         const firebaseConfig = {
-            apiKey: "AIzaSyAsX" + "...", 
+            apiKey: "AIzaSyAsX" + "...",
             authDomain: "movimiento-ras-74e7c.firebaseapp.com",
             databaseURL: "https://movimiento-ras-74e7c-default-rtdb.firebaseio.com",
             projectId: "movimiento-ras-74e7c",
@@ -181,11 +206,14 @@
             appId: "1:89851834241:web:ca43cb397b988f0bc27da7"
         };
 
+
         const app = initializeApp(firebaseConfig);
         auth = getAuth(app);
         dbRealtime = getDatabase(app);
 
+
         window.dbRealtimeInstance = dbRealtime;
+
 
         const savedUsr = localStorage.getItem('ras_usuario_actual');
         const localCachedData = localStorage.getItem('inventario_ras');
@@ -193,19 +221,29 @@
             inventario = JSON.parse(localCachedData);
         }
 
-        // CONTROLADOR DE PERSISTENCIA EN LA NUBE
+
+        // CONTROLADOR DE PERSISTENCIA Y ROLES EN LA NUBE
         onAuthStateChanged(auth, async (authUser) => {
             if (authUser && savedUsr) {
-                const elements = ['usr-actual', 'login-screen', 'app-screen'];
-                const nodes = elements.map(id => document.getElementById(id));
-                if(nodes[0]) nodes[0].innerText = savedUsr;
-                if(nodes[1]) nodes[1].classList.add('hidden');
-                if(nodes[2]) {
-                    nodes[2].classList.remove('hidden');
-                    nodes[2].classList.add('flex');
+                rolUsuarioActual = savedUsr;
+               
+                document.getElementById('usr-actual').innerText = savedUsr;
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('flex');
+
+
+                // Mostrar formulario de alta SOLAMENTE al Coordinador General
+                const panelAgregar = document.getElementById('panel-agregar-producto');
+                if (rolUsuarioActual === 'Coordinador General') {
+                    panelAgregar.classList.remove('hidden');
+                } else {
+                    panelAgregar.classList.add('hidden');
                 }
 
+
                 lucide.createIcons();
+
 
                 const productosRef = ref(dbRealtime, 'productos');
                 onValue(productosRef, (snapshot) => {
@@ -221,15 +259,24 @@
             }
         });
 
+
         // AGREGAR PRODUCTOS DINÁMICAMENTE
         window.agregarProductoManual = function(e) {
             if (e && e.preventDefault) e.preventDefault();
+
+
+            if (rolUsuarioActual !== 'Coordinador General') {
+                alert("Acceso denegado. Solo los coordinadores generales pueden añadir productos.");
+                return;
+            }
+
 
             const nombre = document.getElementById('add-nombre').value.trim();
             const categoria = document.getElementById('add-categoria').value.trim();
             const unidad = document.getElementById('add-unidad').value.trim();
             const ubicacion = document.getElementById('add-ubicacion').value;
             const stockObjetivo = parseInt(document.getElementById('add-objetivo').value);
+
 
             const nuevoProd = {
                 id: Date.now(),
@@ -241,52 +288,86 @@
                 cantidadActual: 0
             };
 
+
             inventario.push(nuevoProd);
             window.renderAll();
             window.guardarSilencioso();
+
 
             document.getElementById('form-nuevo-producto').reset();
             window.showToast(`✨ ¡${nombre} guardado correctamente!`);
         };
 
-        // ELIMINAR PRODUCTOS DE LA BASE DE DATOS
+
+        // ELIMINAR PRODUCTOS (MÓDULO PROTEGIDO)
         window.eliminarProducto = function(id, nombre) {
-            if (confirm(`¿Estás seguro de que deseas eliminar "${nombre}" del inventario?`)) {
+            if (rolUsuarioActual !== 'Coordinador General') {
+                alert("Acceso denegado. No tienes permisos para borrar productos.");
+                return;
+            }
+
+
+            if (confirm(`¿Estás seguro de que deseas eliminar por completo "${nombre}" del sistema?`)) {
                 inventario = inventario.filter(prod => prod.id !== id);
                 window.renderAll();
                 window.guardarSilencioso();
-                window.showToast(`🗑️ Producto "${nombre}" eliminado.`);
+                window.showToast(`🗑️ Producto "${nombre}" eliminado de la nube.`);
             }
         };
 
-        // MANEJADOR DE INICIO DE SESIÓN
+
+        // MANEJADOR DE INICIO DE SESIÓN INTEGRANDO PINES DIFERENCIADOS
         window.handleLogin = async function(e) {
             if (e && e.preventDefault) e.preventDefault();
 
+
             const usuarioSel = document.getElementById('login-usuario').value;
             const pinIngresado = document.getElementById('login-pin').value;
+           
+            let pinValido = false;
+           
+            // FILTRO DE CONTRASEÑAS POR ACCESO SELECTIVO
+            if (usuarioSel === 'Encargado Almacén Chico' && pinIngresado === '1234') {
+                pinValido = true;
+            } else if (usuarioSel === 'Coordinador General' && pinIngresado === '4321') {
+                pinValido = true;
+            }
 
-            if (pinIngresado === '1234') {
+
+            if (pinValido) {
                 document.getElementById('login-error').classList.add('hidden');
                 localStorage.setItem('ras_usuario_actual', usuarioSel);
+                rolUsuarioActual = usuarioSel;
+
 
                 if (auth) {
                     try {
                         const emailSimulado = `${usuarioSel.toLowerCase().replace(/[^a-z0-9]/g, '')}@movimientoras.org`;
                         await signInWithEmailAndPassword(auth, emailSimulado, "Password1234_");
                     } catch (err) {
-                        console.warn("Autenticación local activa.");
+                        console.warn("Autenticación local iniciada.");
                     }
                 }
+
 
                 document.getElementById('usr-actual').innerText = usuarioSel;
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('app-screen').classList.remove('hidden');
                 document.getElementById('app-screen').classList.add('flex');
-                
-                window.showToast(`👋 ¡Base de datos sincronizada!`);
+               
+                // Mostrar/Ocultar formulario según rol al ingresar
+                const panelAgregar = document.getElementById('panel-agregar-producto');
+                if (rolUsuarioActual === 'Coordinador General') {
+                    panelAgregar.classList.remove('hidden');
+                    window.showToast(`👑 Modo Coordinador: Permisos totales activos.`);
+                } else {
+                    panelAgregar.classList.add('hidden');
+                    window.showToast(`👋 Modo Encargado: Sincronización en tiempo real activa.`);
+                }
+               
                 window.renderAll();
                 setTimeout(() => lucide.createIcons(), 100);
+
 
                 const productosRef = ref(dbRealtime, 'productos');
                 onValue(productosRef, (snapshot) => {
@@ -302,6 +383,7 @@
             }
         };
 
+
         window.handleLogout = async function() {
             try { await signOut(auth); } catch (e) {}
             localStorage.removeItem('ras_usuario_actual');
@@ -310,6 +392,7 @@
             document.getElementById('app-screen').classList.add('hidden');
             document.getElementById('login-screen').classList.remove('hidden');
         };
+
 
         window.guardarSilencioso = async function() {
             localStorage.setItem('inventario_ras', JSON.stringify(inventario));
@@ -322,14 +405,17 @@
             }
         };
 
+
         window.handleBuscar = function() {
             textoBusquedaActual = document.getElementById('buscador').value.toLowerCase();
             window.renderAll();
         };
 
+
         window.filtrarEstante = function(estante) {
             filtroEstanteActual = estante;
             const botones = { 'todos': 'btn-estante-todos', 'Almacena (General)': 'btn-estante-general', 'Mueble de Madera': 'btn-estante-madera' };
+
 
             Object.keys(botones).forEach(key => {
                 const btn = document.getElementById(botones[key]);
@@ -344,6 +430,7 @@
             window.renderAll();
         };
 
+
         window.cambiarCantidad = function(id, factor) {
             const prod = inventario.find(p => p.id === id);
             if (prod) {
@@ -356,11 +443,13 @@
             }
         };
 
-        // RENDERIZADO ADAPTATIVO CON APARTADO DE BORRADO
+
+        // RENDERIZADO CON CRITERIO DE ALERTAS Y PERMISOS DE SELECCIÓN
         window.renderAll = function() {
             const contenedor = document.getElementById('contenedor-productos');
             if (!contenedor) return;
             contenedor.innerHTML = '';
+
 
             const productosFiltrados = inventario.filter(prod => {
                 if (!prod) return false;
@@ -368,6 +457,7 @@
                 const cumpleBusqueda = prod.nombre.toLowerCase().includes(textoBusquedaActual) || prod.categoria.toLowerCase().includes(textoBusquedaActual);
                 return cumpleEstante && cumpleBusqueda;
             });
+
 
             if (productosFiltrados.length === 0) {
                 contenedor.innerHTML = `
@@ -380,32 +470,48 @@
                 return;
             }
 
+
             productosFiltrados.forEach(prod => {
                 const falta = Math.max(0, prod.stockObjetivo - prod.cantidadActual);
-                
+                const esCritico = (prod.cantidadActual === 0);
+               
                 let badgeEstatus = '';
-                if (prod.cantidadActual === 0) {
-                    badgeEstatus = `<span class="inline-flex items-center gap-1 bg-pink-50 text-pink-600 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-pink-100"><span class="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse"></span> Vacío</span>`;
+                let estiloTarjetaExtra = '';
+
+
+                if (esCritico) {
+                    // Diseño Crítico: Fondo rosa suave y alerta parpadeante
+                    badgeEstatus = `<span class="inline-flex items-center gap-1 bg-rose-100 text-rose-700 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-rose-200 animate-pulse"><i data-lucide="alert-triangle" class="w-3 h-3"></i> CRÍTICO: VACÍO</span>`;
+                    estiloTarjetaExtra = "bg-rose-50/60 border-t-pink-600 alerta-vacio shadow-pink-100";
                 } else if (prod.cantidadActual < prod.stockObjetivo) {
                     badgeEstatus = `<span class="inline-flex items-center bg-sky-50 text-sky-700 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-sky-100">Incompleto</span>`;
+                    estiloTarjetaExtra = "bg-white border-t-pink-500 shadow-sm";
                 } else {
-                    badgeEstatus = `<span class="inline-flex items-center bg-teal-50 text-teal-700 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-teal-100">✓ Lleno</span>`;
+                    badgeEstatus = `<span class="inline-flex items-center bg-teal-50 text-teal-700 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-teal-100">✓ Surtido</span>`;
+                    estiloTarjetaExtra = "bg-white border-t-teal-500 shadow-sm";
                 }
 
+
+                // Ocultar botón eliminar si es Encargado Almacén Chico
+                const botonEliminarHTML = (rolUsuarioActual === 'Coordinador General') ? `
+                    <button onclick="window.eliminarProducto(${prod.id}, '${prod.nombre}')" class="text-slate-300 hover:text-rose-600 p-1 rounded-lg hover:bg-rose-100 transition" title="Eliminar producto">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                ` : '';
+
+
                 const tarjeta = document.createElement('div');
-                tarjeta.className = "bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between hover:shadow-md transition duration-200 border-t-4 border-t-pink-500 relative";
+                tarjeta.className = `p-5 rounded-2xl border border-slate-100 flex flex-col justify-between hover:shadow-md transition duration-200 border-t-4 relative ${estiloTarjetaExtra}`;
                 tarjeta.innerHTML = `
                     <div class="space-y-3">
-                        <div class="flex items-start justify-between gap-6">
+                        <div class="flex items-start justify-between gap-4">
                             <div>
-                                <h3 class="font-bold text-slate-900 text-base leading-tight pr-4">${prod.nombre}</h3>
+                                <h3 class="font-bold text-slate-900 text-base leading-tight pr-2">${prod.nombre}</h3>
                                 <p class="text-xs text-slate-400 mt-0.5 font-medium">${prod.categoria} • ${prod.unidad}</p>
                             </div>
-                            <div class="flex flex-col items-end gap-2 shrink-0">
+                            <div class="flex flex-col items-end gap-1.5 shrink-0">
                                 ${badgeEstatus}
-                                <button onclick="window.eliminarProducto(${prod.id}, '${prod.nombre}')" class="text-slate-300 hover:text-rose-600 p-1 rounded-lg hover:bg-rose-50 transition" title="Eliminar producto">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
+                                ${botonEliminarHTML}
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
@@ -418,12 +524,12 @@
                             </div>
                             <div class="border-l border-slate-200">
                                 <p class="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Falta llevar</p>
-                                <p class="font-extrabold text-sm mt-0.5 ${falta > 0 ? 'text-pink-600' : 'text-slate-400'}">${falta > 0 ? `${falta} pzs` : '—'}</p>
+                                <p class="font-extrabold text-sm mt-0.5 ${falta > 0 ? 'text-pink-600 font-black' : 'text-slate-400'}">${falta > 0 ? `${falta} pzs` : '—'}</p>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="flex items-center justify-between mt-5 pt-3 border-t border-slate-50">
+                   
+                    <div class="flex items-center justify-between mt-5 pt-3 border-t border-slate-100">
                         <span class="text-xs font-bold text-slate-400">Cantidad en Almacén</span>
                         <div class="flex items-center gap-3">
                             <button onclick="window.cambiarCantidad(${prod.id}, -1)" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold transition text-lg active:scale-90">-</button>
@@ -435,14 +541,17 @@
                 contenedor.appendChild(tarjeta);
             });
 
+
             lucide.createIcons();
         };
+
 
         // GENERACIÓN DE REPORTES EN PDF
         window.exportarPDF = function(tipo) {
             const { jsPDF } = window.jspdf;
             const docPDF = new jsPDF('p', 'pt', 'a4');
             const fechaActual = new Date().toLocaleDateString('es-MX');
+
 
             docPDF.setFillColor(219, 39, 119);
             docPDF.rect(0, 0, 595, 75, 'F');
@@ -455,17 +564,21 @@
             docPDF.text("Sistema de Auditoría y Control de Doble Almacén", 35, 52);
             docPDF.text(`Fecha: ${fechaActual}`, 480, 44);
 
+
             let productosParaPDF = [...inventario].filter(Boolean);
             if (tipo === 'chico') {
                 productosParaPDF = productosParaPDF.filter(p => (p.stockObjetivo - p.cantidadActual) > 0);
             }
 
+
             const productosVacios = productosParaPDF.filter(p => p.cantidadActual === 0);
             const productosIncompletos = productosParaPDF.filter(p => p.cantidadActual > 0 && p.cantidadActual < p.stockObjetivo);
             const productosLlenos = productosParaPDF.filter(p => p.cantidadActual >= p.stockObjetivo);
 
+
             let coordenadaYActual = 110;
             const columnasTabla = ["Producto / Categoría", "Ubicación", "Objetivo", "Actual", "Acción Requerida"];
+
 
             function construirSeccionTabla(tituloSeccion, listadoProductos, colorRGB) {
                 if (listadoProductos.length === 0) return;
@@ -476,13 +589,15 @@
                 docPDF.setFontSize(11);
                 docPDF.text(tituloSeccion, 42, coordenadaYActual);
 
+
                 const filasDatos = listadoProductos.map(p => {
                     const diferencia = p.stockObjetivo - p.cantidadActual;
                     return [
                         `${p.nombre}\n(${p.categoria})`, p.ubicacion, `${p.stockObjetivo} pzs`, `${p.cantidadActual} pzs`,
-                        diferencia > 0 ? `Faltan ${diferencia} ${p.unit || 'pzs'}` : "Surtido Completo"
+                        diferencia > 0 ? `Faltan ${diferencia} ${p.unidad || 'pzs'}` : "Surtido Completo"
                     ];
                 });
+
 
                 docPDF.autoTable({
                     head: [columnasTabla], body: filasDatos, startY: coordenadaYActual + 8,
@@ -493,11 +608,13 @@
                 coordenadaYActual = docPDF.lastAutoTable.finalY + 35;
             }
 
-            construirSeccionTabla("1. ESTANTES COMPLETAMENTE VACÍOS (URGENTE)", productosVacios, [219, 39, 119]);
+
+            construirSeccionTabla("1. ESTANTES COMPLETAMENTE VACÍOS (CRÍTICO)", productosVacios, [219, 39, 119]);
             construirSeccionTabla("2. PRODUCTOS CON STOCK INSUFICIENTE (POR SURTIR)", productosIncompletos, [217, 119, 6]);
             if (tipo === 'general') {
                 construirSeccionTabla("3. PRODUCTOS CON INVENTARIO ÓPTIMO", productosLlenos, [2, 132, 199]);
             }
+
 
             docPDF.setFontSize(8); docPDF.setTextColor(148, 163, 184);
             docPDF.text("Este reporte fue generado de forma automatizada por el Sistema de Inventario Movimiento RAS.", 35, 810);
@@ -505,6 +622,7 @@
             docPDF.save(`Reporte_Inventario_RAS_${tipo}_${nombreLimpioFecha}.pdf`);
             window.showToast("📄 Reporte en PDF generado con éxito.");
         };
+
 
         // NOTIFICACIONES TOAST
         window.showToast = function(mensaje) {
