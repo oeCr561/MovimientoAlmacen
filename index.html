@@ -572,8 +572,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
+import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot } from "https://wwww.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         // --- BASE DE DATOS REAL DESDE TUS FOTOS DE MOVIMIENTO RAS ---
         const DATA_INICIAL = [
             // --- SECCIÓN 1: ALACENA (General / Almacena) ---
@@ -784,31 +783,25 @@ onAuthStateChanged(auth, async (authUser) => {
         };
 
 window.guardarSilencioso = async function() {
-    // 1. Guardar copia local de seguridad en el navegador (Almacenamiento local)
+    // 1. Guardar copia local temporal en el navegador
     localStorage.setItem('inventario_ras', JSON.stringify(inventario));
     
-    // 2. Subir el inventario corregido y completo a Cloud Firestore
+    // 2. Subir el inventario corregido al Cloud Firestore en tiempo real
     if (window.dbFirestore && window.currentAppId) {
         try {
-            // Replicamos exactamente la misma ruta estructurada de tu onSnapshot
+            // Generamos exactamente la misma ruta que usas para leer en el onSnapshot
             const docRef = doc(window.dbFirestore, 'artifacts', window.currentAppId, 'public', 'data', 'inventario', 'actual');
             
-            // Guardamos el array de productos dentro del campo 'items' que espera tu lectura
+            // Guardamos el array de productos en el campo 'items' que espera tu app
             await setDoc(docRef, { items: inventario });
-            console.log("Sincronización automática en Firestore completada con éxito.");
+            console.log("¡Sincronizado con éxito en Cloud Firestore!");
         } catch (err) {
-            console.error("Error crítico al sincronizar con Cloud Firestore:", err);
+            console.error("Error al escribir en Cloud Firestore:", err);
         }
     } else {
-        console.warn("No se pudo sincronizar: Firestore o AppID no están inicializados.");
+        console.warn("No se pudo sincronizar: Firestore no ha sido inicializado en el objeto window.");
     }
-
-    // Subir el inventario corregido y completo a Firebase Realtime Database
-    if (window.baseDeDatos) {
-        window.baseDeDatos.ref('productos').set(inventario)
-            .catch(err => console.error("Error al sincronizar con Firebase:", err));
-    }
-};   // --- SISTEMA DE EXPORTACIÓN DE PDF PROFESIONAL ---
+}; 
        // --- SISTEMA DE EXPORTACIÓN DE PDF PROFESIONAL DE TRES TABLAS ---
 window.exportarPDF = function(tipo) {
     const { jsPDF } = window.jspdf;x
