@@ -695,42 +695,45 @@
         const initFirebase = async () => {
             if (typeof __firebase_config !== 'undefined' && __firebase_config) {
                 try {
-                    const firebaseConfig = JSON.parse(__firebase_config);
-                    const app = initializeApp(firebaseConfig);
-                    auth = getAuth(app);
-                    db = getFirestore(app);
-                    appId = typeof __app_id !== 'undefined' ? __app_id : 'movimiento-ras-default';
-                     window.dbFirestore = db; 
-                     window.currentAppId = appId;
-                    const savedUsr = localStorage.getItem('ras_usuario_actual');
-                    
-                    onAuthStateChanged(auth, async (authUser) => {
-                        if (authUser && savedUsr) {
-                            user = authUser;
-                            document.getElementById('usr-actual').innerText = savedUsr;
-                            document.getElementById('login-screen').classList.add('hidden');
-                            document.getElementById('app-screen').classList.remove('hidden');
-                            document.getElementById('app-screen').classList.add('flex');
-                            
-                            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'inventario', 'actual');
-                            onSnapshot(docRef, (docSnap) => {
-                                if (docSnap.exists()) {
-                                    const data = docSnap.data();
-                                    if (data && data.items) {
-                                        inventario = data.items;
-                                        renderAll();
-                                    }
-                                } else {
-                                    setDoc(docRef, { items: DATA_INICIAL });
-                                }
-                            }, (err) => {
-                                console.error("Error al leer de Firestore:", err);
-                            });
-                        } else {
-                            document.getElementById('app-screen').classList.add('hidden');
-                            document.getElementById('login-screen').classList.remove('hidden');
-                        }
-                    });
+                  const firebaseConfig = JSON.parse(__firebase_config);
+const app = initializeApp(firebaseConfig);
+auth = getAuth(app);
+db = getFirestore(app);
+
+// Dejamos el cálculo del appId aquí arriba
+appId = typeof __app_id !== 'undefined' ? __app_id : 'movimiento-ras-default';
+
+const savedUsr = localStorage.getItem('ras_usuario_actual');
+
+onAuthStateChanged(auth, async (authUser) => {
+    if (authUser && savedUsr) {
+        user = authUser;
+        document.getElementById('usr-actual').innerText = savedUsr;
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('app-screen').classList.remove('hidden');
+        document.getElementById('app-screen').classList.add('flex');
+
+        // === 🌟 ¡MUEVE ESTAS DOS LÍNEAS AQUÍ ADENTRO! 🌟 ===
+        window.dbFirestore = db;
+        window.currentAppId = appId;
+        // ===================================================
+
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'inventario', 'actual');
+        onSnapshot(docRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data && data.items) {
+                    inventario = data.items;
+                    renderAll();
+                }
+            } else {
+                setDoc(docRef, { items: DATA_INICIAL });
+            }
+        }, (err) => {
+            console.error("Error al leer de Firestore:", err);
+        });
+    }
+});
 
                 } catch (e) {
                     console.error("No se pudo iniciar Firebase. Corriendo en modo local offline:", e);
