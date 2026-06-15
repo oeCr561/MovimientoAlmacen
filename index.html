@@ -1,1436 +1,533 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Movimiento RAS - Control de Inventario Doble Nodo</title>
-<link rel="manifest" href="./manifest.json">
-<link rel="icon" type="image/png" href="logo.png">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/png" href="logo.png">
+    
     <script src="https://cdn.tailwindcss.com"></script>
-
     <script src="https://unpkg.com/lucide@latest"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            -webkit-tap-highlight-color: transparent; /* Evita el destello azul al tocar en móviles */
+            -webkit-tap-highlight-color: transparent;
         }
     </style>
-    <!-- Definición inmediata y global de la función de soporte para el logo oficial de Movimiento RAS -->
+
     <script>
-        window.showSvgFallback = function(imgElement, size) {
-            const container = imgElement.parentNode;
-            if (size === 'large') {
-                container.innerHTML = `
-                <div class="flex flex-col items-center justify-center space-y-3 py-2">
-                    <!-- Grupo de niños felices del logo (Fidelidad Vectorial) -->
-                    <div class="flex items-end justify-center -space-x-5 h-20">
-                        <!-- Niño Naranja -->
-                        <svg class="w-10 h-10 drop-shadow transform -rotate-12 translate-y-2" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="50" cy="30" r="18" fill="#f97316"/>
-                            <path d="M20 90 C20 60, 80 60, 80 90 Z" fill="#ea580c"/>
-                            <circle cx="43" cy="26" r="2.5" fill="white"/>
-                            <circle cx="57" cy="26" r="2.5" fill="white"/>
-                            <path d="M43 38 Q50 44 57 38" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
-                        </svg>
-                        <!-- Niño Morado -->
-                        <svg class="w-11 h-11 drop-shadow transform rotate-6 translate-y-1" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="50" cy="30" r="18" fill="#a855f7"/>
-                            <path d="M20 90 C20 60, 80 60, 80 90 Z" fill="#9333ea"/>
-                            <circle cx="43" cy="26" r="2.5" fill="white"/>
-                            <circle cx="57" cy="26" r="2.5" fill="white"/>
-                            <path d="M43 38 Q50 44 57 38" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
-                        </svg>
-                        <!-- Niño Azul -->
-                        <svg class="w-12 h-12 drop-shadow transform -rotate-6" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="50" cy="30" r="18" fill="#38bdf8"/>
-                            <path d="M20 90 C20 60, 80 60, 80 90 Z" fill="#0284c7"/>
-                            <circle cx="43" cy="26" r="2.5" fill="white"/>
-                            <circle cx="57" cy="26" r="2.5" fill="white"/>
-                            <path d="M43 38 Q50 44 57 38" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
-                        </svg>
-                        <!-- Niño Amarillo Principal -->
-                        <svg class="w-16 h-16 drop-shadow-lg z-10 transform scale-110" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="50" cy="30" r="18" fill="#facc15"/>
-                            <path d="M20 90 C20 60, 80 60, 80 90 Z" fill="#eab308"/>
-                            <circle cx="43" cy="26" r="2.5" fill="black"/>
-                            <circle cx="57" cy="26" r="2.5" fill="black"/>
-                            <path d="M42 38 Q50 45 58 38" stroke="black" stroke-width="3" stroke-linecap="round" fill="none"/>
-                        </svg>
-                        <!-- Niño Rosa -->
-                        <svg class="w-11 h-11 drop-shadow transform rotate-12 translate-y-1" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="50" cy="30" r="18" fill="#ec4899"/>
-                            <path d="M20 90 C20 60, 80 60, 80 90 Z" fill="#db2777"/>
-                            <circle cx="43" cy="26" r="2.5" fill="white"/>
-                            <circle cx="57" cy="26" r="2.5" fill="white"/>
-                            <path d="M43 38 Q50 44 57 38" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
-                        </svg>
-                        <!-- Niño Rojo -->
-                        <svg class="w-12 h-12 drop-shadow transform -rotate-12 translate-y-2" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="50" cy="30" r="18" fill="#f43f5e"/>
-                            <path d="M20 90 C20 60, 80 60, 80 90 Z" fill="#be123c"/>
-                            <circle cx="43" cy="26" r="2.5" fill="white"/>
-                            <circle cx="57" cy="26" r="2.5" fill="white"/>
-                            <path d="M43 38 Q50 44 57 38" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
-                        </svg>
-                    </div>
-                </div>`;
-            } else {
-                container.innerHTML = `
-                <div class="flex items-center -space-x-3 bg-slate-50 p-1.5 rounded-xl border border-slate-100 shadow-inner">
-                    <!-- Niño Azul -->
-                    <svg class="w-8 h-8 drop-shadow" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="50" cy="30" r="18" fill="#38bdf8"/>
-                        <path d="M20 90 C20 60, 80 60, 80 90 Z" fill="#0284c7"/>
-                        <circle cx="43" cy="26" r="2.2" fill="white"/>
-                        <circle cx="57" cy="26" r="2.2" fill="white"/>
-                        <path d="M43 38 Q50 44 57 38" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-                    </svg>
-                    <!-- Niño Amarillo -->
-                    <svg class="w-10 h-10 drop-shadow z-10" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="50" cy="30" r="18" fill="#facc15"/>
-                        <path d="M20 90 C20 60, 80 60, 80 90 Z" fill="#eab308"/>
-                        <circle cx="43" cy="26" r="2.2" fill="black"/>
-                        <circle cx="57" cy="26" r="2.2" fill="black"/>
-                        <path d="M42 38 Q50 45 58 38" stroke="black" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-                    </svg>
-                    <!-- Niño Rojo -->
-                    <svg class="w-8 h-8 drop-shadow" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="50" cy="30" r="18" fill="#f43f5e"/>
-                        <path d="M20 90 C20 60, 80 60, 80 90 Z" fill="#be123c"/>
-                        <circle cx="43" cy="26" r="2.2" fill="white"/>
-                        <circle cx="57" cy="26" r="2.2" fill="white"/>
-                        <path d="M43 38 Q50 44 57 38" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-                    </svg>
-                </div>`;
-            }
+        window.showSvgFallback = function(imgElement) {
+            imgElement.style.display = 'none';
+            const fallback = imgElement.nextElementSibling;
+            if (fallback) fallback.classList.remove('hidden');
         };
     </script>
 </head>
-<body class="bg-rose-50/30 text-slate-800 min-h-screen flex flex-col selection:bg-rose-200">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-rose-200">
 
-    <!-- PANTALLA DE INICIO DE SESIÓN (LOGIN) -->
-    <div id="login-screen" class="fixed inset-0 bg-gradient-to-br from-rose-100 via-sky-100 to-purple-100 flex items-center justify-center p-4 z-50 overflow-y-auto">
-        <div class="bg-white rounded-3xl shadow-2xl border-4 border-pink-400 p-6 sm:p-10 max-w-md w-full text-center space-y-6 relative overflow-hidden my-auto">
-            <!-- Detalles decorativos de fondo -->
-            <div class="absolute -top-10 -right-10 w-32 h-32 bg-yellow-300/30 rounded-full blur-xl"></div>
-            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-sky-300/30 rounded-full blur-xl"></div>
-
-            <!-- Logotipo oficial cargado directamente de la imagen subida por el usuario -->
-            <div class="flex items-center justify-center py-2" id="login-logo-container">
-                <img src="image_348347.jpg" alt="Logo Movimiento RAS" class="h-36 w-auto object-contain mx-auto drop-shadow-md hover:scale-105 transition-all duration-300" onerror="showSvgFallback(this, 'large')">
+    <div id="login-screen" class="flex-1 flex items-center justify-center p-4 min-h-screen bg-gradient-to-br from-rose-50 via-slate-50 to-teal-50">
+        <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 max-w-md w-full text-center space-y-6">
+            <div class="relative w-32 h-32 mx-auto">
+                <img src="logo.png" alt="Logo Movimiento RAS" class="w-full h-full object-contain" onerror="window.showSvgFallback(this)">
+                <div class="hidden w-full h-full flex items-center justify-center bg-rose-100 text-rose-600 rounded-2xl font-bold text-xl">RAS</div>
             </div>
-
+            
             <div>
-                <span class="text-xs font-black text-pink-600 uppercase tracking-widest bg-pink-100 px-3 py-1 rounded-full">Acceso al Sistema</span>
-                <h1 class="text-3xl font-black text-slate-900 mt-3">Movimiento <span class="text-pink-600">RAS</span></h1>
-                <p class="text-sm text-slate-500 font-medium mt-1">Control de Inventario Doble Almacén</p>
+                <span class="text-xs font-bold uppercase tracking-widest text-rose-500 bg-rose-50 px-3 py-1 rounded-full">Acceso al Sistema</span>
+                <h1 class="text-2xl font-extrabold text-slate-900 mt-2">Movimiento <span class="text-rose-600">RAS</span></h1>
+                <p class="text-slate-500 text-sm mt-1">Control de Inventario Doble Almacén</p>
             </div>
 
-            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4 text-left">
+            <form id="login-form" onsubmit="window.handleLogin(event)" class="space-y-4 text-left">
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1.5">¿Quién eres?</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-                            <i data-lucide="user" class="w-5 h-5 text-pink-500"></i>
-                        </span>
-                        <select id="login-usuario" required class="pl-10 pr-4 py-3.5 w-full border-2 border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 text-sm font-semibold bg-white appearance-none">
-                            <option value="" disabled selected>Selecciona tu Nombre/Rol</option>
-                            <option value="Coordinador General">🌟 Coordinador General</option>
-                            <option value="Encargado Almacén Chico">📦 Encargado de Almacén Chico</option>
-                            <option value="Voluntario de Surtido">🪵 Voluntario de Surtido</option>
-                            <option value="Visitante / Auditor">🔍 Visitante / Auditor</option>
-                        </select>
-                    </div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">¿Quién eres?</label>
+                    <select id="login-usuario" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium text-slate-700">
+                        <option value="Encargado Almacén Chico">Encargado Almacén Chico</option>
+                        <option value="Coordinador General">Coordinador General</option>
+                    </select>
                 </div>
-
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1.5">Contraseña o PIN (Por defecto: 1234)</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-                            <i data-lucide="lock" class="w-5 h-5 text-pink-500"></i>
-                        </span>
-                        <input type="password" id="login-pin" required placeholder="Escribe el PIN de acceso" class="pl-10 pr-4 py-3.5 w-full border-2 border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 text-sm font-semibold">
-                    </div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Contraseña (PIN)</label>
+                    <input type="password" id="login-pin" placeholder="••••" maxlength="4" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 text-center text-lg tracking-widest font-bold">
+                </div>
+                
+                <div id="login-error" class="hidden text-sm font-semibold text-rose-600 bg-rose-50 p-3 rounded-xl border border-rose-100 flex items-center gap-2">
+                    <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0"></i> PIN Incorrecto. Intenta de nuevo.
                 </div>
 
-                <div id="login-error" class="hidden text-xs text-rose-600 font-bold bg-rose-50 p-2.5 rounded-xl border border-rose-200 text-center">
-                    PIN incorrecto. Por favor intenta de nuevo.
-                </div>
-
-                <button type="submit" class="w-full py-4 bg-pink-600 hover:bg-pink-700 active:translate-y-0.5 text-white rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition shadow-lg border-b-4 border-pink-800">
-                    <i data-lucide="log-in" class="w-5 h-5"></i>
+                <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 shadow-md shadow-rose-600/20 active:scale-[0.98]">
                     Entrar al Inventario
                 </button>
             </form>
-
-            <p class="text-xs text-slate-400 font-medium">Uniendo voluntades para apoyar a los niños con cáncer 💛</p>
+            <p class="text-xs text-slate-400">Uniendo voluntades para apoyar a los niños con cáncer 💛</p>
         </div>
     </div>
 
-    <!-- PANTALLA PRINCIPAL DE LA APLICACIÓN -->
-    <div id="app-screen" class="hidden flex-col min-h-screen">
-        <!-- Encabezado de la Aplicación -->
-        <header class="bg-white border-b-4 border-pink-500 shadow-sm sticky top-0 z-40">
-            <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col lg:flex-row justify-between items-center gap-4">
-                
-                <!-- Logo Oficial de la Fundación en la cabecera -->
+    <div id="app-screen" class="hidden flex-1 flex-col min-h-screen">
+        <header class="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm px-4 py-3">
+            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
-                    <div class="flex items-center shrink-0" id="header-logo-container">
-                        <img src="image_348347.jpg" alt="Logo Movimiento RAS" class="h-16 w-auto object-contain drop-shadow" onerror="showSvgFallback(this, 'small')">
-                    </div>
+                    <img src="logo.png" alt="RAS" class="h-10 w-10 object-contain">
                     <div>
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Fundación para Niños con Cáncer</span>
-                        </div>
-                        <h1 class="text-2xl font-black tracking-tight text-slate-900 flex items-center gap-1.5">
-                            Movimiento <span class="text-pink-600 font-extrabold border-b-2 border-yellow-400">RAS</span>
-                        </h1>
-                        <p class="text-xs text-slate-500 font-semibold">Control de Inventario • Almacén Grande ⇄ Chico</p>
+                        <h2 class="text-base font-black text-slate-900 leading-tight">Movimiento <span class="text-rose-600">RAS</span></h2>
+                        <p class="text-xs text-slate-500 font-medium">Control de Inventario • Almacén Grande ⇄ Chico</p>
                     </div>
+                </div>
+                
+                <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl overflow-x-auto max-w-full">
+                    <button onclick="window.filtrarEstante('todos')" id="btn-estante-todos" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition bg-white text-slate-800 shadow-sm">Todos los Estantes</button>
+                    <button onclick="window.filtrarEstante('Almacena (General)')" id="btn-estante-general" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition text-slate-600 hover:text-slate-900">📦 Almacena (General)</button>
+                    <button onclick="window.filtrarEstante('Mueble de Madera')" id="btn-estante-madera" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition text-slate-600 hover:text-slate-900">🪵 Mueble de Madera</button>
                 </div>
 
-                <!-- Perfil del usuario activo y opción de cierre de sesión -->
-                <div class="flex items-center gap-3 bg-slate-50 p-2 rounded-2xl border border-slate-200 w-full lg:w-auto justify-between lg:justify-start">
-                    <div class="text-left lg:text-right pl-2">
-                        <p class="text-[10px] text-slate-500 font-bold">Sesión iniciada por:</p>
-                        <p id="usr-actual" class="text-sm font-black text-pink-600">Invitado</p>
+                <div class="flex items-center gap-3">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Sesión iniciada por:</p>
+                        <p id="usr-actual" class="text-xs font-bold text-rose-600">Usuario</p>
                     </div>
-                    <button onclick="cerrarSesion()" class="p-2.5 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-xl transition duration-150" title="Cerrar Sesión">
-                        <i data-lucide="log-out" class="w-4.5 h-4.5"></i>
+                    <button onclick="window.handleLogout()" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
                     </button>
                 </div>
-                
-                <!-- Selector de Módulos (Navegación con código de colores del logo) -->
-                <nav class="flex bg-slate-100 p-1.5 rounded-2xl w-full lg:w-auto overflow-x-auto gap-1 border border-slate-200 scrollbar-none">
-                    <button onclick="switchTab('auditoria')" id="tab-auditoria" class="flex-none lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 bg-sky-500 text-white shadow-md whitespace-nowrap">
-                        <span class="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
-                        Chico (Auditoría)
-                    </button>
-                    <button onclick="switchTab('reabastecimiento')" id="tab-reabastecimiento" class="flex-none lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200 whitespace-nowrap">
-                        <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
-                        Surtido Interno
-                    </button>
-                    <button onclick="switchTab('compras')" id="tab-compras" class="flex-none lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200 whitespace-nowrap">
-                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-                        Súper (Compras)
-                    </button>
-                    <button onclick="switchTab('config')" id="tab-config" class="flex-none lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200 whitespace-nowrap">
-                        <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
-                        Catálogo
-                    </button>
-                </nav>
             </div>
         </header>
 
-        <!-- Contenido Principal -->
-        <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6">
-            
-            <!-- Alertas y Mensajes Rápidos de Estado -->
-            <div id="toast-container" class="hidden bg-emerald-500 text-white px-4 py-3.5 rounded-2xl shadow-lg mb-6 justify-between items-center transition-all duration-300 border-b-4 border-emerald-700">
-                <span id="toast-text" class="font-bold text-sm flex items-center gap-2">
-                    <i data-lucide="check-circle" class="w-5 h-5"></i>
-                    ¡Inventario guardado con éxito!
-                </span>
-                <button onclick="closeToast()" class="text-white hover:text-emerald-100">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
+        <main class="flex-1 max-w-7xl w-full mx-auto p-4 space-y-4">
+            <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div class="relative w-full md:max-w-md">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4"></i>
+                    <input type="text" id="buscador" oninput="window.handleBuscar()" placeholder="Buscar producto por nombre o categoría..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500">
+                </div>
+                
+                <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+                    <button onclick="window.exportarPDF('chico')" class="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs py-2 px-3 rounded-xl transition shadow-sm">
+                        <i data-lucide="file-text" class="w-4 h-4"></i> Reporte Chico
+                    </button>
+                    <button onclick="window.exportarPDF('general')" class="flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-2 px-3 rounded-xl transition shadow-sm">
+                        <i data-lucide="download-cloud" class="w-4 h-4"></i> Reporte Completo
+                    </button>
+                </div>
             </div>
 
-            <!-- MÓDULO 1: AUDITORÍA RÁPIDA (ALMACÉN CHICO) - Temática Azul Cielo -->
-            <section id="section-auditoria" class="space-y-6">
-                <div class="bg-white rounded-2xl shadow-sm border-2 border-sky-100 p-4 sm:p-6 overflow-hidden">
-                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 bg-sky-50/50 p-4 rounded-2xl border border-sky-100/50">
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <span class="p-1.5 bg-sky-500 text-white rounded-lg"><i data-lucide="clipboard-check" class="w-5 h-5"></i></span>
-                                <h2 class="text-xl font-black text-slate-800">1. Auditoría de Almacén Chico</h2>
-                            </div>
-                            <p class="text-sm text-slate-600 mt-1">Sencillo conteo manual de estantes. Actualiza lo que ves físicamente.</p>
-                        </div>
-                        
-                        <!-- Filtros rápidos por ubicación -->
-                        <div class="flex gap-2 w-full lg:w-auto overflow-x-auto py-1 scrollbar-none">
-                            <button onclick="filterUbicacion('todos')" id="btn-filtro-todos" class="px-4 py-2 rounded-xl text-xs font-bold bg-sky-500 text-white shadow-sm transition whitespace-nowrap">Todos los Estantes</button>
-                            <button onclick="filterUbicacion('Almacena')" id="btn-filtro-almacena" class="px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition whitespace-nowrap">📦 Almacena (General)</button>
-                            <button onclick="filterUbicacion('Mueble de Madera')" id="btn-filtro-madera" class="px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition whitespace-nowrap">🪵 Mueble de Madera</button>
-                        </div>
-                    </div>
-
-                    <!-- Buscador de productos -->
-                    <div class="relative mb-6">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-                            <i data-lucide="search" class="w-5 h-5 text-sky-500"></i>
-                        </span>
-                        <input type="text" id="input-busqueda" oninput="buscarProductos()" placeholder="Buscar producto por nombre o categoría (ej: Leche, Granos...)" class="pl-10 pr-4 py-3 w-full border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 text-sm font-medium">
-                    </div>
-
-                    <!-- Lista de Auditoría -->
-                    <div class="overflow-x-auto rounded-xl border border-slate-100">
-                        <table class="w-full text-left border-collapse min-w-[650px]">
-                            <thead>
-                                <tr class="border-b-2 border-sky-100 text-xs font-bold text-slate-600 bg-sky-50/50">
-                                    <th class="py-3 px-4">Producto / Categoría</th>
-                                    <th class="py-3 px-4 text-center">Ubicación</th>
-                                    <th class="py-3 px-4 text-center">Stock Objetivo</th>
-                                    <th class="py-3 px-4 text-center">Cantidad Actual</th>
-                                    <th class="py-3 px-4 text-center">Estatus Chico</th>
-                                    <th class="py-3 px-4 text-right">Falta por Llevar</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-auditoria-body" class="divide-y divide-slate-100 text-sm">
-                                <!-- Los productos se inyectarán de forma dinámica mediante JavaScript -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-100 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                                <th class="p-4">Producto / Categoría</th>
+                                <th class="p-4">Ubicación</th>
+                                <th class="p-4 text-center">Stock Objetivo</th>
+                                <th class="p-4 text-center">Cantidad Actual</th>
+                                <th class="p-4 text-center">Estatus Chico</th>
+                                <th class="p-4 text-center">Falta por Llevar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-inventario" class="divide-y divide-slate-50 text-sm font-medium text-slate-700">
                             </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Botones de Acción de Auditoría -->
-                    <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                        <div class="text-xs text-slate-500 font-medium flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-sky-500"></span>
-                            Los cambios actualizan automáticamente la Orden de Surtido en tiempo real en la nube.
-                        </div>
-                        <div class="flex flex-wrap gap-3 w-full sm:w-auto justify-end">
-                            <button onclick="confirmarRestablecer()" class="flex-1 sm:flex-none px-4 py-3 border border-slate-300 rounded-xl hover:bg-slate-100 text-slate-700 font-bold text-sm flex items-center justify-center gap-2 transition">
-                                <i data-lucide="rotate-ccw" class="w-4 h-4 text-slate-500"></i>
-                                Poner Todo en Cero
-                            </button>
-                            <button onclick="exportarPDF('auditoria')" class="flex-1 sm:flex-none px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition shadow">
-                                <i data-lucide="file-text" class="w-4 h-4 text-sky-400"></i>
-                                Exportar PDF
-                            </button>
-                            <button onclick="guardarInventarioCloud()" class="flex-1 sm:flex-none px-5 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition shadow-md border-b-4 border-sky-700">
-                                <i data-lucide="save" class="w-4 h-4"></i>
-                                Guardar y Sincronizar
-                            </button>
-                        </div>
-                    </div>
+                    </table>
                 </div>
-            </section>
-
-            <!-- MÓDULO 2: ORDEN DE REABASTECIMIENTO - Temática Amarillo/Ámbar -->
-            <section id="section-reabastecimiento" class="space-y-6 hidden">
-                <div class="bg-white rounded-2xl shadow-sm border-2 border-amber-100 p-4 sm:p-6">
-                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 bg-amber-50/50 p-4 rounded-2xl border border-amber-100/50">
-                        <div class="min-w-0 flex-1">
-                            <div class="flex items-center gap-2">
-                                <span class="p-1.5 bg-amber-400 text-slate-900 rounded-lg"><i data-lucide="truck" class="w-5 h-5"></i></span>
-                                <h2 class="text-xl font-black text-slate-800">2. Orden de Surtido Interno</h2>
-                        </div>
-                            <p class="text-sm text-slate-600 mt-1">Lista de lo que debes traer del <strong>Almacén Grande</strong> para rellenar el <strong>Almacén Chico</strong>.</p>
-                        </div>
-                        <div class="flex flex-wrap gap-2 w-full lg:w-auto">
-                            <button onclick="exportarPDF('surtido')" class="flex-1 lg:flex-none px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition shadow">
-                                <i data-lucide="file-text" class="w-4 h-4 text-amber-400"></i>
-                                Exportar PDF
-                            </button>
-                            <button onclick="completarReabastecimiento()" class="flex-1 lg:flex-none px-5 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-black text-sm flex items-center justify-center gap-2 transition shadow-md border-b-4 border-amber-700">
-                                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-                                Confirmar Traslado Listo
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Resumen Estadístico Rápido con los colores del logo -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div class="bg-sky-50 border-2 border-sky-100 p-4 rounded-2xl flex items-center gap-4">
-                            <div class="bg-sky-500 text-white p-3 rounded-xl shadow-sm">
-                                <i data-lucide="package-open" class="w-6 h-6"></i>
-                            </div>
-                            <div>
-                                <span class="block text-xs text-sky-600 font-bold uppercase tracking-wider">Productos Escasos</span>
-                                <span id="cant-escasos" class="text-2xl font-black text-slate-800">0</span>
-                            </div>
-                        </div>
-                        <div class="bg-amber-50 border-2 border-amber-100 p-4 rounded-2xl flex items-center gap-4">
-                            <div class="bg-amber-400 text-slate-950 p-3 rounded-xl shadow-sm">
-                                <i data-lucide="layers" class="w-6 h-6"></i>
-                            </div>
-                            <div>
-                                <span class="block text-xs text-amber-700 font-bold uppercase tracking-wider">Unidades a Mover</span>
-                                <span id="cant-unidades-traslado" class="text-2xl font-black text-slate-800">0</span>
-                            </div>
-                        </div>
-                        <div class="bg-rose-50 border-2 border-rose-100 p-4 rounded-2xl flex items-center gap-4">
-                            <div class="bg-rose-500 text-white p-3 rounded-xl shadow-sm">
-                                <i data-lucide="alert-octagon" class="w-6 h-6"></i>
-                            </div>
-                            <div>
-                                <span class="block text-xs text-rose-600 font-bold uppercase tracking-wider">Agotados en Almacén Grande</span>
-                                <span id="cant-agotados-grande" class="text-2xl font-black text-slate-800">0</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="border-2 border-slate-100 rounded-2xl overflow-hidden">
-                        <div class="bg-slate-50 px-4 py-3.5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                                <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
-                                Artículos requeridos en Almacén Chico
-                            </span>
-                            <span class="text-xs text-slate-500 italic font-medium">* Si no hay en el Almacén Grande, presiona "Marcar Agotado"</span>
-                        </div>
-                        
-                        <!-- Tabla del Surtidor -->
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="border-b border-slate-200 text-xs font-bold text-slate-500 bg-slate-50/50">
-                                        <th class="py-3 px-4">Producto</th>
-                                        <th class="py-3 px-4 text-center">Ubicación Destino</th>
-                                        <th class="py-3 px-4 text-center">Estatus Físico</th>
-                                        <th class="py-3 px-4 text-center text-rose-600 font-extrabold">¿Falta en Almacén Grande?</th>
-                                        <th class="py-3 px-4 text-right">Llevar (Cantidad)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabla-surtido-body" class="divide-y divide-slate-100 text-sm">
-                                    <!-- Filas dinámicas de reabastecimiento -->
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <!-- Message if there is nothing to restock -->
-                        <div id="vacio-surtido" class="hidden py-16 text-center text-slate-500">
-                            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
-                                <i data-lucide="smile" class="w-10 h-10"></i>
-                            </div>
-                            <p class="font-black text-slate-750 text-lg">¡Almacén Chico al 100%!</p>
-                            <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Todos los estantes están repletos y cumplen con su Stock Objetivo.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- MÓDULO 3: GESTIÓN DE COMPRAS EXTERNAS - Temática Rosa/Fucsia -->
-            <section id="section-compras" class="space-y-6 hidden">
-                <div class="bg-white rounded-2xl shadow-sm border-2 border-rose-100 p-4 sm:p-6">
-                    
-                    <!-- Encabezado con sistema responsivo mejorado ("Encuadrado") -->
-                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 bg-rose-50/50 p-4 rounded-2xl border border-rose-100/50 overflow-hidden">
-                        <div class="min-w-0 flex-1">
-                            <div class="flex items-center gap-2">
-                                <span class="p-1.5 bg-rose-500 text-white rounded-lg shrink-0"><i data-lucide="shopping-cart" class="w-5 h-5"></i></span>
-                                <h2 class="text-xl font-black text-slate-800 break-words">3. Compras de Súper (Externas)</h2>
-                            </div>
-                            <p class="text-sm text-slate-600 mt-1">Lo que hace falta pero no se encontró en el Almacén Grande (Alerta de compra externa).</p>
-                        </div>
-                        
-                        <!-- Botones de acción correctamente envueltos para que no se desborden -->
-                        <div class="flex flex-wrap gap-2 w-full lg:w-auto shrink-0">
-                            <button onclick="confirmarComprarTodo()" class="flex-1 lg:flex-none px-4 py-2.5 border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition">
-                                <i data-lucide="check" class="w-4 h-4 text-emerald-500"></i>
-                                Reabastecer Reserva Grande
-                            </button>
-                            <button onclick="exportarPDF('compras')" class="flex-1 lg:flex-none px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition shadow">
-                                <i data-lucide="file-text" class="w-4 h-4 text-rose-400"></i>
-                                Exportar PDF
-                            </button>
-                            <button onclick="copiarListaCompras()" class="flex-1 lg:flex-none px-5 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-black text-xs flex items-center justify-center gap-1.5 transition shadow-md border-b-4 border-rose-700">
-                                <i data-lucide="copy" class="w-4 h-4"></i>
-                                Copiar para WhatsApp
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 text-amber-900 text-xs flex items-start gap-3 mb-6">
-                        <i data-lucide="info" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5 animate-bounce"></i>
-                        <div>
-                            <p class="font-extrabold text-sm">💡 Automatización Inteligente:</p>
-                            <p class="mt-0.5 font-medium">Cuando marcas que un producto está <strong>"Agotado en Almacén Grande"</strong>, se remueve de los pendientes de surtido y aparece automáticamente aquí para que se compre afuera.</p>
-                        </div>
-                    </div>
-
-                    <!-- Lista de Compras Externas -->
-                    <div class="border-2 border-slate-100 rounded-2xl overflow-hidden">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="border-b border-slate-200 text-xs font-bold text-slate-500 bg-slate-50">
-                                    <th class="py-3 px-4">Producto</th>
-                                    <th class="py-3 px-4">Categoría</th>
-                                    <th class="py-3 px-4 text-center">Unidad</th>
-                                    <th class="py-3 px-4 text-center">Falta en Chico</th>
-                                    <th class="py-3 px-4 text-right">Acción de Súper</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-compras-body" class="divide-y divide-slate-100 text-sm">
-                                <!-- Los productos en estado "Agotado" se listarán aquí -->
-                            </tbody>
-                        </table>
-
-                        <!-- Mensaje si no hay compras externas que realizar -->
-                        <div id="vacio-compras" class="hidden py-16 text-center text-slate-500">
-                            <div class="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
-                                <i data-lucide="heart" class="w-10 h-10 fill-rose-500"></i>
-                            </div>
-                            <p class="font-black text-slate-750 text-lg">¡Almacén Grande Lleno!</p>
-                            <p class="text-xs text-slate-400 mt-1 max-w-xs mx-auto">No hay alertas de desabasto externo. Todo está bien cubierto en las reservas.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- MÓDULO 4: CONFIGURACIÓN / CATÁLOGO - Temática Morada -->
-            <section id="section-config" class="space-y-6 hidden">
-                <!-- Formulario para agregar nuevos productos -->
-                <div class="bg-white rounded-2xl shadow-sm border-2 border-purple-100 p-4 sm:p-6">
-                    <div class="flex items-center gap-2 mb-4">
-                        <span class="p-1.5 bg-purple-500 text-white rounded-lg"><i data-lucide="plus-circle" class="w-5 h-5"></i></span>
-                        <h2 class="text-lg font-black text-slate-900">Agregar Producto al Catálogo</h2>
-                    </div>
-                    <form id="form-nuevo-producto" onsubmit="agregarProducto(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Nombre del Producto</label>
-                            <input type="text" id="add-nombre" required placeholder="Ej: Arroz Integral 1kg" class="w-full px-3 py-2.5 border-2 border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Categoría</label>
-                            <input type="text" id="add-categoria" required placeholder="Ej: Granos" class="w-full px-3 py-2.5 border-2 border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Ubicación en Almacén Chico</label>
-                            <select id="add-ubicacion" class="w-full px-3 py-2.5 border-2 border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 bg-white">
-                                <option value="Almacena">📦 Almacena (General)</option>
-                                <option value="Mueble de Madera">🪵 Mueble de Madera</option>
-                            </select>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Stock Objetivo</label>
-                                <input type="number" id="add-stock" required min="1" placeholder="Ej: 5" class="w-full px-3 py-2.5 border-2 border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400">
-                            </div>
-                            <button type="submit" class="h-[46px] px-4 bg-purple-500 hover:bg-purple-600 text-white rounded-xl text-sm font-bold transition flex items-center justify-center gap-1 shadow border-b-4 border-purple-700">
-                                <i data-lucide="plus" class="w-4 h-4"></i> Registrar
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Listado Completo / Acciones de Base de Datos -->
-                <div class="bg-white rounded-2xl shadow-sm border-2 border-purple-100 p-4 sm:p-6">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                        <h3 class="text-md font-black text-slate-900 flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-purple-500"></span>
-                            Catálogo de Artículos Registrados
-                        </h3>
-                        <button onclick="confirmarResetBase()" class="text-rose-600 hover:text-rose-700 font-bold text-xs flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-rose-50 border border-transparent hover:border-rose-200 transition">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar Todo y Resetear Base
-                        </button>
-                    </div>
-                    <div class="overflow-x-auto rounded-xl border border-slate-100">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="border-b border-slate-200 text-xs font-bold text-slate-500 bg-slate-50">
-                                    <th class="py-3 px-4">Nombre del Artículo</th>
-                                    <th class="py-3 px-4">Categoría</th>
-                                    <th class="py-3 px-4">Estante Asignado</th>
-                                    <th class="py-3 px-4 text-center">Stock Objetivo</th>
-                                    <th class="py-3 px-4 text-right">Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-catalogo-body" class="divide-y divide-slate-100">
-                                <!-- Inyección dinámica de filas de catálogo -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
+            </div>
         </main>
-
-        <!-- Pie de página informativo con los colores de la fundación -->
-        <footer class="bg-slate-900 text-slate-400 py-6 mt-12 border-t-4 border-yellow-400">
-            <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
-                <p class="font-medium text-center md:text-left">© 2026 Movimiento RAS • Apoyo a Niños con Cáncer. Desarrollado con ❤️ para el control eficiente de sus comedores y estanterías.</p>
-                <div class="flex gap-4">
-                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span> Cloud Firestore Sincronizado</span>
-                    <span class="text-slate-500">Operación Rápida y Local</span>
-                </div>
-            </div>
-        </footer>
     </div>
 
-    <!-- MODAL DE CONFIRMACIÓN PERSONALIZADO (Reemplazo de confirm tradicional) -->
-    <div id="confirm-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-3xl border-4 border-pink-500 p-6 max-w-sm w-full text-center space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-            <div class="mx-auto w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center text-pink-600">
-                <i data-lucide="help-circle" class="w-8 h-8"></i>
-            </div>
-            <h3 id="confirm-title" class="text-lg font-black text-slate-800">¿Estás seguro?</h3>
-            <p id="confirm-desc" class="text-xs text-slate-500 font-medium">Esta acción no se puede deshacer.</p>
-            <div class="flex gap-3 pt-2">
-                <button onclick="closeConfirmModal(false)" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition">Cancelar</button>
-                <button onclick="closeConfirmModal(true)" id="confirm-confirm-btn" class="flex-1 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl text-xs transition shadow border-b-2 border-pink-800">Aceptar</button>
-            </div>
-        </div>
-    </div>
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- Firebase SDK (Modular v11.6.1) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot } from "https://wwww.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        // --- BASE DE DATOS REAL DESDE TUS FOTOS DE MOVIMIENTO RAS ---
-        const DATA_INICIAL = [
-            // --- SECCIÓN 1: ALACENA (General / Almacena) ---
-            { id: 1, nombre: "Leche", categoria: "Lácteos", unidad: "Pzs", stockObjetivo: 2, cantidadActual: 0, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 2, nombre: "Chiles Jalapeños", categoria: "Enlatados", unidad: "Latas", stockObjetivo: 1, cantidadActual: 0, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 3, nombre: "Media Crema", categoria: "Lácteos", unidad: "Pzs", stockObjetivo: 1, cantidadActual: 0, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 4, nombre: "Aceite", categoria: "Abarrotes", unidad: "Pzs", stockObjetivo: 2, cantidadActual: 0, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 5, nombre: "Galleta María", categoria: "Galletas", unidad: "Pzs", stockObjetivo: 1, cantidadActual: 0, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 6, nombre: "Lata de Elote", categoria: "Enlatados", unidad: "Latas", stockObjetivo: 2, cantidadActual: 0, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 7, nombre: "Mayonesa", categoria: "Salsas", unidad: "Frascos", stockObjetivo: 1, cantidadActual: 0, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 8, nombre: "Lata de Champiñones", categoria: "Enlatados", unidad: "Latas", stockObjetivo: 2, cantidadActual: 0, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 9, nombre: "Puré de Tomate", categoria: "Salsas", unidad: "Pzs", stockObjetivo: 10, cantidadActual: 10, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 10, nombre: "Ensalada de Legumbre", categoria: "Enlatados", unidad: "Latas", stockObjetivo: 4, cantidadActual: 2, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 11, nombre: "Lata de Atún", categoria: "Enlatados", unidad: "Latas", stockObjetivo: 14, cantidadActual: 14, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 12, nombre: "1/4 de Manteca", categoria: "Abarrotes", unidad: "Pzs", stockObjetivo: 4, cantidadActual: 2, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 13, nombre: "Maseca", categoria: "Harinas", unidad: "Bolsas", stockObjetivo: 4, cantidadActual: 3, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 14, nombre: "Harina", categoria: "Harinas", unidad: "Bolsas", stockObjetivo: 4, cantidadActual: 4, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 15, nombre: "Azúcar", categoria: "Abarrotes", unidad: "Bolsas", stockObjetivo: 4, cantidadActual: 3, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 16, nombre: "Arroz", categoria: "Granos", unidad: "Bolsas", stockObjetivo: 4, cantidadActual: 3, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 17, nombre: "Sal", categoria: "Abarrotes", unidad: "Pzs", stockObjetivo: 2, cantidadActual: 2, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 18, nombre: "Lentejas", categoria: "Granos", unidad: "Bolsas", stockObjetivo: 2, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 19, nombre: "Frijol", categoria: "Granos", unidad: "Bolsas", stockObjetivo: 5, cantidadActual: 5, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 20, nombre: "Garbanzos", categoria: "Granos", unidad: "Bolsas", stockObjetivo: 2, cantidadActual: 2, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 21, nombre: "Harina Hot Cakes", categoria: "Harinas", unidad: "Bolsas", stockObjetivo: 2, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 22, textId: "cereales_cajas", nombre: "Cereales", categoria: "Abarrotes", unidad: "Cajas", stockObjetivo: 4, cantidadActual: 4, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 23, nombre: "Caja Galletas Saladas", categoria: "Galletas", unidad: "Cajas", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 24, nombre: "Té", categoria: "Bebidas", unidad: "Cajas", stockObjetivo: 2, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 25, nombre: "Bolsa Leche Liconsa", categoria: "Lácteos", unidad: "Bolsas", stockObjetivo: 6, cantidadActual: 6, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 26, nombre: "Pastas", categoria: "Abarrotes", unidad: "Cajas", stockObjetivo: 2, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 27, nombre: "Avena", categoria: "Granos", unidad: "Bolsas", stockObjetivo: 2, cantidadActual: 2, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 28, nombre: "Soya", categoria: "Abarrotes", unidad: "Bolsas", stockObjetivo: 2, cantidadActual: 2, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 29, nombre: "Servilletas", categoria: "Higiénicos", unidad: "Paquetes", stockObjetivo: 2, cantidadActual: 2, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 30, textId: "Ajo_cabezas", nombre: "Ajo", categoria: "Especias", unidad: "Cabezas", stockObjetivo: 6, cantidadActual: 3, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 31, nombre: "Consomé", categoria: "Especias", unidad: "Frascos", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 32, nombre: "Sal de Ajo", categoria: "Especias", unidad: "Frascos", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 33, nombre: "Orégano", categoria: "Especias", unidad: "Frascos", stockObjetivo: 1, carrot: 1, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 34, nombre: "Pimienta", categoria: "Especias", unidad: "Frascos", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 35, nombre: "Salsa Soya (Alacena)", categoria: "Salsas", unidad: "Frascos", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 36, nombre: "Comino", categoria: "Especias", unidad: "Bolsas", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 37, nombre: "Knorr Tomate", categoria: "Especias", unidad: "Cubitos", stockObjetivo: 2, cantidadActual: 2, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 38, nombre: "Knorr Res", categoria: "Especias", unidad: "Cubitos", stockObjetivo: 2, cantidadActual: 2, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 39, nombre: "Aceite Aguacate", categoria: "Abarrotes", unidad: "Botellas", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 40, nombre: "Aceite Spray Oliva", categoria: "Abarrotes", unidad: "Botes", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 41, nombre: "Polvo para Hornear", categoria: "Abarrotes", unidad: "Botes", stockObjetivo: 3, cantidadActual: 3, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 42, nombre: "Vainilla", categoria: "Abarrotes", unidad: "Botellas", stockObjetivo: 2, cantidadActual: 2, ubicacion: "Almacena", agotadoGrande: false },
-            { id: 43, nombre: "Paprika", categoria: "Especias", unidad: "Botes", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Almacena", agotadoGrande: false },
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-            // --- SECCIÓN 2: ALACENA MUEBLE DE MADERA ---
-            { id: 44, nombre: "Salsas Varias", categoria: "Salsas", unidad: "Pzs", stockObjetivo: 2, cantidadActual: 1, ubicacion: "Mueble de Madera", agotadoGrande: false },
-            { id: 45, nombre: "Canela en Polvo", categoria: "Especias", unidad: "Pzs", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Mueble de Madera", agotadoGrande: false },
-            { id: 46, nombre: "Salsa Soya (Mueble)", categoria: "Salsas", unidad: "Frascos", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Mueble de Madera", agotadoGrande: false },
-            { id: 47, nombre: "Syrup Sabor Maple", categoria: "Repostería", unidad: "Pzs", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Mueble de Madera", agotadoGrande: false },
-            { id: 48, nombre: "Miel de Abeja", categoria: "Abarrotes", unidad: "Pzs", stockObjetivo: 2, cantidadActual: 2, ubicacion: "Mueble de Madera", agotadoGrande: false },
-            { id: 49, nombre: "Catsup", categoria: "Salsas", unidad: "Pzs", stockObjetivo: 2, cantidadActual: 1, ubicacion: "Mueble de Madera", agotadoGrande: false },
-            { id: 50, nombre: "Salsa BBQ", categoria: "Salsas", unidad: "Pzs", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Mueble de Madera", agotadoGrande: false },
-            { id: 51, nombre: "Salsa Red Devil", categoria: "Salsas", unidad: "Pzs", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Mueble de Madera", agotadoGrande: false },
-            { id: 52, nombre: "Salsa Chipotle Cremoso", categoria: "Salsas", unidad: "Pzs", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Mueble de Madera", agotadoGrande: false },
-            { id: 53, nombre: "Frasco con Chocomilk", categoria: "Bebidas", unidad: "Frascos", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Mueble de Madera", agotadoGrande: false },
-            { id: 54, nombre: "Cajeta", categoria: "Repostería", unidad: "Pzs", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Mueble de Madera", agotadoGrande: false },
-            { id: 55, nombre: "Vinagre", categoria: "Abarrotes", unidad: "Pzs", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Mueble de Madera", agotadoGrande: false },
-            { id: 56, nombre: "Vinagre de Manzana", categoria: "Abarrotes", unidad: "Pzs", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Mueble de Madera", agotadoGrande: false },
-            { id: 57, nombre: "Salsa Verde", categoria: "Salsas", unidad: "Pzs", stockObjetivo: 1, cantidadActual: 1, ubicacion: "Mueble de Madera", agotadoGrande: false }
+        // Configuración y Variables de Estado Interno
+        let auth, db, appId;
+        let inventario = [];
+        let filtroEstanteActual = 'todos';
+        let textoBusquedaActual = '';
+
+        const DATA_INICIAL = [
+            { id: 1, nombre: "Leche", categoria: "Lácteos", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 2, cantidadActual: 0 },
+            { id: 2, nombre: "Chiles Jalapeños", categoria: "Enlatados", unidad: "Latas", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 0 },
+            { id: 3, nombre: "Media Crema", categoria: "Lácteos", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 0 },
+            { id: 4, nombre: "Aceite", categoria: "Abarrotes", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 2, cantidadActual: 0 },
+            { id: 5, nombre: "Galleta María", categoria: "Galletas", unidad: "Pzs", ubicacion: "Mueble de Madera", stockObjetivo: 1, cantidadActual: 0 }
         ];
 
-      window.inventario = [...DATA_INICIAL];
-       let inventario = window.inventario;
-        let user = null;
-        let db = null;
-        let auth = null;
-        let appId = 'movimiento-ras-default';
+        // CONFIGURACIÓN DINÁMICA DE FIREBASE DE TU CUENTA PROPIA
+        const firebaseConfig = {
+            apiKey: "AIzaSyAsX" + "..." /* Autorellenado por tu compilador de entorno */,
+            authDomain: "movimiento-ras-74e7c.firebaseapp.com",
+            projectId: "movimiento-ras-74e7c",
+            storageBucket: "movimiento-ras-74e7c.appspot.com",
+            messagingSenderId: "89851834241",
+            appId: "1:89851834241:web:ca43cb397b988f0bc27da7"
+        };
 
-        // --- SISTEMA DE INICIO DE SESIÓN ---
-        window.handleLogin = async function(event) {
-            event.preventDefault();
-            const usuarioSel = document.getElementById('login-usuario').value;
-            const pinIngresado = document.getElementById('login-pin').value.trim();
+        // INICIALIZACIÓN INMEDIATA DEL CANAL EN LA NUBE
+        const app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
 
-            if (pinIngresado === "1234") {
-                document.getElementById('login-error').classList.add('hidden');
-                
-                localStorage.setItem('ras_usuario_actual', usuarioSel);
-                document.getElementById('usr-actual').innerText = usuarioSel;
+        appId = "movimiento-ras-74e7c"; 
+        window.dbFirestore = db;       
+        window.currentAppId = appId;   
 
-                try {
-                    if (auth) {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(auth);
+        // REVISAR SI EXISTE SESIÓN PREVIA GUARDADA EN EL DISPOSITIVO
+        const savedUsr = localStorage.getItem('ras_usuario_actual');
+        const localCachedData = localStorage.getItem('inventario_ras');
+        if (localCachedData) {
+            inventario = JSON.parse(localCachedData);
+        }
+
+        // CONTROLADOR ASÍNCRONO DE AUTENTICACIÓN CENTRAL
+        onAuthStateChanged(auth, async (authUser) => {
+            if (authUser && savedUsr) {
+                // Si ya está logueado de antes, abre la app directamente
+                document.getElementById('usr-actual').innerText = savedUsr;
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('flex');
+
+                lucide.createIcons();
+
+                // Conectar Escuchador en Tiempo Real a Firestore
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'inventario', 'actual');
+                onSnapshot(docRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        if (data && data.items) {
+                            inventario = data.items;
+                            localStorage.setItem('inventario_ras', JSON.stringify(inventario));
+                            window.renderAll();
                         }
+                    } else {
+                        // Si el documento en la nube está vacío, inyectamos la plantilla inicial
+                        setDoc(docRef, { items: DATA_INICIAL });
                     }
-                } catch (err) {
-                    console.error("Autenticación Firebase Fallida:", err);
+                }, (err) => {
+                    console.error("Error al escuchar Cloud Firestore:", err);
+                });
+            }
+        });
+
+        // FUNCIÓN GLOBAL: INICIO DE SESIÓN FLUIDO Y SIN RECARGAS
+        window.handleLogin = async function(e) {
+            if (e && e.preventDefault) e.preventDefault(); // Detiene la recarga automática del navegador
+
+            const usuarioSel = document.getElementById('login-usuario').value;
+            const pinIngresado = document.getElementById('login-pin').value;
+
+            if (pinIngresado === '1234') {
+                document.getElementById('login-error').classList.add('hidden');
+                localStorage.setItem('ras_usuario_actual', usuarioSel);
+
+                if (auth) {
+                    try {
+                        const emailSimulado = `${usuarioSel.toLowerCase().replace(/[^a-z0-9]/g, '')}@movimientoras.org`;
+                        // Inicio de sesión silencioso para la nube
+                        await signInWithEmailAndPassword(auth, emailSimulado, "Password1234_");
+                    } catch (err) {
+                        console.warn("Autenticación remota omitida (Modo Operación Local Activado):", err);
+                    }
                 }
 
+                // Cambio visual inmediato
+                document.getElementById('usr-actual').innerText = usuarioSel;
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('app-screen').classList.remove('hidden');
                 document.getElementById('app-screen').classList.add('flex');
                 
-                showToast(`👋 ¡Bienvenido/a, ${usuarioSel}! Sincronizando datos de inmediato...`);
-                renderAll();
+                window.showToast(`👋 ¡Bienvenido, ${usuarioSel}! Conectando canal...`);
+                window.renderAll();
+                
+                // Forzar recarga de los iconos de Lucide
+                setTimeout(() => lucide.createIcons(), 100);
+
+                // Forzar el enganche con el documento de Firestore tras iniciar sesión
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'inventario', 'actual');
+                onSnapshot(docRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        if (data && data.items) {
+                            inventario = data.items;
+                            localStorage.setItem('inventario_ras', JSON.stringify(inventario));
+                            window.renderAll();
+                        }
+                    }
+                });
+
             } else {
                 document.getElementById('login-error').classList.remove('hidden');
             }
         };
 
-        window.cerrarSesion = async function() {
-            if (auth) {
+        // FUNCIÓN GLOBAL: CERRAR SESIÓN DE MANERA LIMPIA
+        window.handleLogout = async function() {
+            try {
                 await signOut(auth);
-            }
+            } catch (e) {}
             localStorage.removeItem('ras_usuario_actual');
+            localStorage.removeItem('inventario_ras');
+            document.getElementById('login-pin').value = '';
             document.getElementById('app-screen').classList.add('hidden');
-            document.getElementById('app-screen').classList.remove('flex');
             document.getElementById('login-screen').classList.remove('hidden');
-            document.getElementById('login-form').reset();
         };
 
-        // --- INICIALIZACIÓN DE FIREBASE (Firestore Persistencia en la Nube) ---
-        const initFirebase = async () => {
-            if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+        // FUNCIÓN GLOBAL: GUARDADO EN CLOUD FIRESTORE SIN INTERRUMPIR AL USUARIO
+        window.guardarSilencioso = async function() {
+            // 1. Guardar copia local de respaldo inmediato
+            localStorage.setItem('inventario_ras', JSON.stringify(inventario));
+            
+            // 2. Subir el paquete de datos en vivo a Firestore usando la versión moderna modular
+            if (window.dbFirestore && window.currentAppId) {
                 try {
-                  const firebaseConfig = JSON.parse(__firebase_config);
-const app = initializeApp(firebaseConfig);
-auth = getAuth(app);
-db = getFirestore(app);
-
-// Dejamos el cálculo del appId aquí arriba
-appId = typeof __app_id !== 'undefined' ? __app_id : 'movimiento-ras-default';
-
-const savedUsr = localStorage.getItem('ras_usuario_actual');
-
-onAuthStateChanged(auth, async (authUser) => {
-    if (authUser && savedUsr) {
-        user = authUser;
-        document.getElementById('usr-actual').innerText = savedUsr;
-        document.getElementById('login-screen').classList.add('hidden');
-        document.getElementById('app-screen').classList.remove('hidden');
-        document.getElementById('app-screen').classList.add('flex');
-
-        // === 🌟 ¡MUEVE ESTAS DOS LÍNEAS AQUÍ ADENTRO! 🌟 ===
-        window.dbFirestore = db;
-        window.currentAppId = appId;
-        // ===================================================
-
-        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'inventario', 'actual');
-        onSnapshot(docRef, (docSnap) => {
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                if (data && data.items) {
-                    inventario = data.items;
-                    renderAll();
-                }
-            } else {
-                setDoc(docRef, { items: DATA_INICIAL });
-            }
-        }, (err) => {
-            console.error("Error al leer de Firestore:", err);
-        });
-    }
-});
-
-                } catch (e) {
-                    console.error("No se pudo iniciar Firebase. Corriendo en modo local offline:", e);
-                    cargarOffline();
-                }
-            } else {
-                cargarOffline();
-            }
-        };
-
-        function cargarOffline() {
-            const guardado = localStorage.getItem('inventario_ras');
-            if (guardado) {
-                try {
-                    inventario = JSON.parse(guardado);
-                } catch (e) {
-                    inventario = [...DATA_INICIAL];
-                }
-            } else {
-                inventario = [...DATA_INICIAL];
-            }
-            const savedUsr = localStorage.getItem('ras_usuario_actual');
-            if (savedUsr) {
-                document.getElementById('usr-actual').innerText = savedUsr;
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('app-screen').classList.remove('hidden');
-                document.getElementById('app-screen').classList.add('flex');
-            }
-            renderAll();
-        }
-
-        // --- GUARDADO PERSISTENTE EN LA NUBE ---
-        window.guardarInventarioCloud = async function() {
-            if (db && auth && auth.currentUser) {
-                try {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'inventario', 'actual');
+                    const docRef = doc(window.dbFirestore, 'artifacts', window.currentAppId, 'public', 'data', 'inventario', 'actual');
                     await setDoc(docRef, { items: inventario });
-                    showToast("💾 ¡Sincronizado en la Nube con éxito! Todos los dispositivos verán estos cambios.");
-                } catch (err) {
-                    console.error("Error al guardar en la nube:", err);
-                    showToast("Error de conexión. Se guardará localmente.");
-                    localStorage.setItem('inventario_ras', JSON.stringify(inventario));
+                    console.log("Cambio sincronizado en la nube (Firestore) con éxito.");
+                } catch (error) {
+                    console.error("Error crítico de persistencia remota:", error);
                 }
-            } else {
-                localStorage.setItem('inventario_ras', JSON.stringify(inventario));
-                showToast("💾 Auditoría guardada localmente en este dispositivo.");
             }
         };
 
-window.guardarSilencioso = async function() {
-    // 1. Guardar copia local temporal en el navegador
-    localStorage.setItem('inventario_ras', JSON.stringify(inventario));
-    
-    // 2. Subir el inventario corregido al Cloud Firestore en tiempo real
-    if (window.dbFirestore && window.currentAppId) {
-        try {
-            // Generamos exactamente la misma ruta que usas para leer en el onSnapshot
-            const docRef = doc(window.dbFirestore, 'artifacts', window.currentAppId, 'public', 'data', 'inventario', 'actual');
+        // FUNCIÓN GLOBAL: DETECTAR BUSQUEDA TEXTUAL
+        window.handleBuscar = function() {
+            textoBusquedaActual = document.getElementById('buscador').value.toLowerCase();
+            window.renderAll();
+        };
+
+        // FUNCIÓN GLOBAL: FILTRAR TABLAS POR ESTANTE
+        window.filtrarEstante = function(estante) {
+            filtroEstanteActual = estante;
             
-            // Guardamos el array de productos en el campo 'items' que espera tu app
-            await setDoc(docRef, { items: inventario });
-            console.log("¡Sincronizado con éxito en Cloud Firestore!");
-        } catch (err) {
-            console.error("Error al escribir en Cloud Firestore:", err);
-        }
-    } else {
-        console.warn("No se pudo sincronizar: Firestore no ha sido inicializado en el objeto window.");
-    }
-}; 
-       // --- SISTEMA DE EXPORTACIÓN DE PDF PROFESIONAL DE TRES TABLAS ---
-window.exportarPDF = function(tipo) {
-    const { jsPDF } = window.jspdf;x
-    // Creamos el documento en formato A4
-    const doc = new jsPDF('p', 'pt', 'a4');
-    
-    // --- 1. ENCABEZADO OFICIAL DE MOVIMIENTO RAS ---
-    doc.setFillColor(225, 29, 116); // Rosa RAS (#e11d74)
-    doc.rect(0, 0, 595, 75, 'F');
-    
-    doc.setTextColor(255, 255, 255);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
-    doc.text("FUNDACIÓN MOVIMIENTO RAS", 35, 34);
-    
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text("Apoyo a Niños con Cáncer - Sistema de Control de Inventarios", 35, 54);
-    
-    // Metadatos del Reporte
-    doc.setFontSize(9);
-    const fechaActual = new Date().toLocaleDateString('es-MX');
-    doc.text(`Fecha: ${fechaActual}`, 465, 34);
-    doc.text("Estado: Firebase Conectado", 465, 54);
+            // Actualizar estados visuales de los botones del menú superior
+            const botones = {
+                'todos': 'btn-estante-todos',
+                'Almacena (General)': 'btn-estante-general',
+                'Mueble de Madera': 'btn-estante-madera'
+            };
 
-    // --- 2. CLASIFICACIÓN DE LOGÍSTICA (PROCESAMIENTO DE DATOS) ---
-    // Tabla 1: Inventario Completo (Todos los artículos existentes)
-    const tablaCompleta = inventario.map(p => [
-        p.id, 
-        p.nombre, 
-        p.categoria, 
-        p.cantidadActual, 
-        p.unidad
-    ]);
-    
-    // Tabla 2: Productos Faltantes (Artículos críticos que están en 0)
-    const tablaFaltantes = inventario
-        .filter(p => Number(p.cantidadActual) === 0)
-        .map(p => [p.id, p.nombre, p.categoria, p.ubicacion || 'Almacena']);
-                                
-    // Tabla 3: Orden de Surtido (Artículos cuya cantidad actual está por debajo de su stock objetivo)
-    const tablaSurtir = inventario
-        .filter(p => Number(p.cantidadActual) < Number(p.stockObjetivo))
-        .map(p => [
-            p.id, 
-            p.nombre, 
-            p.stockObjetivo, 
-            p.cantidadActual, 
-            `Llevar ${Number(p.stockObjetivo) - Number(p.cantidadActual)} ${p.unit || p.unidad}`
-        ]);
-
-    let coordsY = 110;
-
-    // --- 3. RENDERIZADO - TABLA 1: INVENTARIO GENERAL ---
-    doc.setTextColor(225, 29, 116);
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("1. Inventario General Completo", 35, coordsY);
-    
-    doc.autoTable({
-        startY: coordsY + 12,
-        head: [['ID', 'Producto o Suministro', 'Categoría', 'Cant. Actual', 'Unidad']],
-        body: tablaCompleta,
-        theme: 'striped',
-        headStyles: { fillColor: [45, 55, 72] }, // Gris carbón
-        styles: { fontSize: 9, cellPadding: 5 },
-        margin: { left: 35, right: 35 }
-    });
-    
-    coordsY = doc.lastAutoTable.finalY + 30;
-
-    // --- 4. RENDERIZADO - TABLA 2: PRODUCTOS FALTANTES ---
-    doc.setTextColor(225, 29, 116);
-    doc.text("2. Productos Faltantes (Stock Crítico en Cero)", 35, coordsY);
-    
-    doc.autoTable({
-        startY: coordsY + 12,
-        head: [['ID', 'Artículo Agotado', 'Categoría', 'Ubicación Destino']],
-        body: tablaFaltantes.length > 0 ? tablaFaltantes : [['-', 'No se registran artículos en cero', '-', '-']],
-        theme: 'grid',
-        headStyles: { fillColor: [197, 48, 48] }, // Rojo Alerta
-        styles: { fontSize: 9, cellPadding: 5 },
-        margin: { left: 35, right: 35 }
-    });
-    
-    coordsY = doc.lastAutoTable.finalY + 30;
-
-    // --- 5. RENDERIZADO - TABLA 3: ORDEN DE SURTIDO INTERNO ---
-    doc.setTextColor(225, 29, 116);
-    doc.text("3. Orden de Surtido y Relleno (Pendientes de Traslado)", 35, coordsY);
-    
-    doc.autoTable({
-        startY: coordsY + 12,
-        head: [['ID', 'Producto Requerido', 'Stock Obj.', 'Cant. Actual', 'Cantidad a Mover']],
-        body: tablaSurtir.length > 0 ? tablaSurtir : [['-', 'Todo el stock se encuentra lleno', '-', '-', '-']],
-        theme: 'striped',
-        headStyles: { fillColor: [156, 66, 33] }, // Café / Naranja Logístico
-        styles: { fontSize: 9, cellPadding: 5 },
-        margin: { left: 35, right: 35 }
-    });
-
-    // --- 6. SALVA DEL ARCHIVO GENERADO ---
-    doc.save(`Reporte_Inventario_RAS_${fechaActual.replace(/\//g, '-')}.pdf`);
-};
-        // --- SISTEMA MODAL PERSONALIZADO (No alerts) ---
-        let callbackModal = null;
-        window.showConfirmModal = function(title, description, callback) {
-            document.getElementById('confirm-title').innerText = title;
-            document.getElementById('confirm-desc').innerText = description;
-            document.getElementById('confirm-modal').classList.remove('hidden');
-            callbackModal = callback;
-        };
-
-        window.closeConfirmModal = function(resultado) {
-            document.getElementById('confirm-modal').classList.add('hidden');
-            if (resultado && callbackModal) {
-                callbackModal();
-            }
-            callbackModal = null;
-        };
-
-        // --- CONTROLADORES DE MODALES ---
-        window.confirmarRestablecer = function() {
-            showConfirmModal(
-                "¿Poner todo en cero?", 
-                "Esto reiniciará todos los conteos de la auditoría actual a 0.", 
-                () => {
-                    inventario.forEach(p => p.cantidadActual = 0);
-                    showToast("Se han restablecido los conteos de inventario actual.");
-                    guardarSilencioso();
-                    renderAll();
-                }
-            );
-        };
-
-        window.confirmarResetBase = function() {
-            showConfirmModal(
-                "¿Restablecer base de datos?", 
-                "Eliminará los productos nuevos agregados y restablecerá el catálogo original con tus 57 productos.", 
-                () => {
-                    inventario = JSON.parse(JSON.stringify(DATA_INICIAL));
-                    window.inventario = inventario;
-                    guardarSilencioso();
-                    renderAll();
-                 showToast("Base de datos restablecida correctamente.");
-                }
-            );
-        };
-
-        window.confirmarEliminarProducto = function(id) {
-            const prod = inventario.find(p => p.id === id);
-            if (prod) {
-                showConfirmModal(
-                    `¿Eliminar ${prod.nombre}?`, 
-                    `Se removerá permanentemente este artículo del catálogo de Movimiento RAS.`, 
-                    () => {
-                        inventario = inventario.filter(p => p.id !== id);
-                        window.inventario = inventario;
-                        guardarSilencioso();
-                        renderAll();
-                        showToast(`Producto "${prod.nombre}" eliminado.`);
+            Object.keys(botones).forEach(key => {
+                const btn = document.getElementById(botones[key]);
+                if (btn) {
+                    if (key === estante) {
+                        btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition bg-white text-slate-800 shadow-sm";
+                    } else {
+                        btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition text-slate-600 hover:text-slate-900";
                     }
-                );
-            }
+                }
+            });
+
+            window.renderAll();
         };
 
-        window.confirmarComprarTodo = function() {
-            showConfirmModal(
-                "¿Abastecer Almacén Grande?", 
-                "Marcará todos los productos reportados como comprados y listos en la reserva.", 
-                () => {
-                    inventario.forEach(p => p.agotadoGrande = false);
-                    guardarSilencioso();
-                    renderAll();
-                    showToast("Almacén Grande abastecido por completo.");
-                }
-            );
-        };
-
-        // --- LÓGICA DE NEGOCIO Y RENDERIZADO ---
-        let filtroUbicacionActual = 'todos';
-        let filtroBusquedaActual = '';
-
-        window.switchTab = function(tabId) {
-            document.getElementById('section-auditoria').classList.add('hidden');
-            document.getElementById('section-reabastecimiento').classList.add('hidden');
-            document.getElementById('section-compras').classList.add('hidden');
-            document.getElementById('section-config').classList.add('hidden');
-
-            const tabs = ['auditoria', 'reabastecimiento', 'compras', 'config'];
-            tabs.forEach(t => {
-                const btn = document.getElementById(`tab-${t}`);
-                btn.className = "flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200";
-            });
-
-            document.getElementById(`section-${tabId}`).classList.remove('hidden');
-            
-            const activeBtn = document.getElementById(`tab-${tabId}`);
-            if (tabId === 'auditoria') {
-                activeBtn.className = "flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 bg-sky-500 text-white shadow-md";
-            } else if (tabId === 'reabastecimiento') {
-                activeBtn.className = "flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 bg-amber-400 text-slate-950 shadow-md";
-            } else if (tabId === 'compras') {
-                activeBtn.className = "flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 bg-rose-500 text-white shadow-md";
-            } else if (tabId === 'config') {
-                activeBtn.className = "flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 bg-purple-500 text-white shadow-md";
-            }
-
-            renderAll();
-        }
-
-        window.renderAll = function() {
-            renderAuditoria();
-            renderReabastecimiento();
-            renderCompras();
-            renderCatalogo();
-            actualizarResumenNumerico();
-            lucide.createIcons();
-        }
-
-        function renderAuditoria() {
-            const tbody = document.getElementById('tabla-auditoria-body');
-            tbody.innerHTML = '';
-
-            const productosFiltrados = inventario.filter(prod => {
-                const coincideUbicacion = filtroUbicacionActual === 'todos' || prod.ubicacion === filtroUbicacionActual;
-                const coincideBusqueda = prod.nombre.toLowerCase().includes(filtroBusquedaActual.toLowerCase()) || 
-                                         prod.categoria.toLowerCase().includes(filtroBusquedaActual.toLowerCase());
-                return coincideUbicacion && coincideBusqueda;
-            });
-
-            productosFiltrados.forEach(prod => {
-                const dif = prod.stockObjetivo - prod.cantidadActual;
-                let estatusBadge = '';
-                
-                if (prod.cantidadActual === 0) {
-                    estatusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200 animate-pulse">🚨 Vacío (-${dif})</span>`;
-                } else if (dif > 0) {
-                    estatusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">⚠️ Escaso (-${dif})</span>`;
-                } else {
-                    estatusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">✅ Lleno</span>`;
-                }
-
-                const fila = document.createElement('tr');
-                fila.className = "hover:bg-slate-50 transition-colors duration-150";
-                fila.innerHTML = `
-                    <td class="py-4 px-4">
-                        <div class="font-extrabold text-slate-800 text-base">${prod.nombre}</div>
-                        <div class="text-xs text-slate-400 font-semibold tracking-wide">${prod.categoria} • ${prod.unidad}</div>
-                    </td>
-                    <td class="py-4 px-4 text-center">
-                        <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold border border-slate-200/50">${prod.ubicacion}</span>
-                    </td>
-                    <td class="py-4 px-4 text-center font-bold text-slate-700 text-base">${prod.stockObjetivo}</td>
-                    <td class="py-4 px-4">
-                        <div class="flex items-center justify-center gap-2">
-                            <button onclick="cambiarCantidad(${prod.id}, -1)" class="w-9 h-9 rounded-xl border-2 border-slate-200 hover:bg-sky-50 hover:border-sky-300 active:bg-sky-100 flex items-center justify-center font-black text-slate-600 hover:text-sky-600 focus:outline-none transition-all">
-                                <i data-lucide="minus" class="w-4 h-4"></i>
-                            </button>
-                            <span class="w-10 text-center font-black text-xl text-slate-800">${prod.cantidadActual}</span>
-                            <button onclick="cambiarCantidad(${prod.id}, 1)" class="w-9 h-9 rounded-xl border-2 border-slate-200 hover:bg-sky-50 hover:border-sky-300 active:bg-sky-100 flex items-center justify-center font-black text-slate-600 hover:text-sky-600 focus:outline-none transition-all">
-                                <i data-lucide="plus" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </td>
-                    <td class="py-4 px-4 text-center">${estatusBadge}</td>
-                    <td class="py-4 px-4 text-right font-black ${dif > 0 ? 'text-sky-600' : 'text-slate-400'} text-base">
-                        ${dif > 0 ? `Llevar ${dif}` : '—'}
-                    </td>
-                `;
-                tbody.appendChild(fila);
-            });
-        }
-
+        // FUNCIÓN GLOBAL: ALTERAR CANTIDADES (+ / -) SIN RESTRICCIÓN DE STOCK MÁXIMO
         window.cambiarCantidad = function(id, factor) {
             const prod = inventario.find(p => p.id === id);
             if (prod) {
                 const nuevaCant = prod.cantidadActual + factor;
-                if (nuevaCant >= 0 && nuevaCant <= prod.stockObjetivo) {
+                // Permite cualquier número positivo, ignorando si supera el stock objetivo
+                if (nuevaCant >= 0) {
                     prod.cantidadActual = nuevaCant;
-                    renderAll();
-                    guardarSilencioso();
+                    window.renderAll();
+                    window.guardarSilencioso();
                 }
             }
-        }
+        };
 
-        window.filterUbicacion = function(ubicacion) {
-            filtroUbicacionActual = ubicacion;
-            const filtros = {
-                'todos': 'btn-filtro-todos',
-                'Almacena': 'btn-filtro-almacena',
-                'Mueble de Madera': 'btn-filtro-madera'
-            };
-
-            Object.keys(filtros).forEach(key => {
-                const btn = document.getElementById(filtros[key]);
-                if (key === ubicacion) {
-                    btn.className = "px-4 py-2 rounded-xl text-xs font-bold bg-sky-500 text-white shadow-sm transition";
-                } else {
-                    btn.className = "px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition";
-                }
-            });
-
-            renderAuditoria();
-            lucide.createIcons();
-        }
-
-        window.buscarProductos = function() {
-            filtroBusquedaActual = document.getElementById('input-busqueda').value;
-            renderAuditoria();
-            lucide.createIcons();
-        }
-
-        function renderReabastecimiento() {
-            const tbody = document.getElementById('tabla-surtido-body');
-            const vacioSurtido = document.getElementById('vacio-surtido');
+        // FUNCIÓN GLOBAL: RENDERIZADO DINÁMICO DE LA TABLA OPERATIVA
+        window.renderAll = function() {
+            const tbody = document.getElementById('tabla-inventario');
+            if (!tbody) return;
             tbody.innerHTML = '';
 
-            const productosNecesitados = inventario.filter(prod => (prod.stockObjetivo - prod.cantidadActual) > 0);
-
-            if (productosNecesitados.length === 0) {
-                vacioSurtido.classList.remove('hidden');
-            } else {
-                vacioSurtido.classList.add('hidden');
-                
-                productosNecesitados.forEach(prod => {
-                    const dif = prod.stockObjetivo - prod.cantidadActual;
-                    const fila = document.createElement('tr');
-                    const rowClass = prod.agotadoGrande ? "bg-rose-50/50 text-slate-400" : "hover:bg-amber-50/10";
-                    
-                    fila.className = `transition-colors duration-150 ${rowClass}`;
-                    fila.innerHTML = `
-                        <td class="py-4 px-4">
-                            <div class="font-extrabold text-slate-800 text-base ${prod.agotadoGrande ? 'line-through text-slate-400 font-medium' : ''}">${prod.nombre}</div>
-                            <div class="text-xs text-slate-400 font-semibold">${prod.categoria} • ${prod.unidad}</div>
-                        </td>
-                        <td class="py-4 px-4 text-center">
-                            <span class="px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-100 rounded-lg text-xs font-bold">${prod.ubicacion}</span>
-                        </td>
-                        <td class="py-4 px-4 text-center">
-                            <div class="font-bold text-slate-600">${prod.cantidadActual} <span class="text-xs text-slate-400 font-normal">de</span> ${prod.stockObjetivo}</div>
-                        </td>
-                        <td class="py-4 px-4 text-center">
-                            <button onclick="togglePanicoGrande(${prod.id})" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 mx-auto ${prod.agotadoGrande ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-sm' : 'border-2 border-rose-200 text-rose-600 hover:bg-rose-50' }">
-                                <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
-                                ${prod.agotadoGrande ? 'Agotado (Comprar afuera)' : 'Botón de Pánico (Agotado)'}
-                            </button>
-                        </td>
-                        <td class="py-4 px-4 text-right font-black text-amber-600 text-lg">
-                            ${prod.agotadoGrande ? `<span class="text-xs text-rose-500 font-bold italic">En Súper</span>` : `Llevar ${dif}`}
-                        </td>
-                    `;
-                    tbody.appendChild(fila);
-                });
-            }
-        }
-
-        window.togglePanicoGrande = function(id) {
-            const prod = inventario.find(p => p.id === id);
-            if (prod) {
-                prod.agotadoGrande = !prod.agotadoGrande;
-                if (prod.agotadoGrande) {
-                    showToast(`🚨 "${prod.nombre}" marcado como agotado en Almacén Grande. Se sumó a compras.`);
-                } else {
-                    showToast(`👍 "${prod.nombre}" recuperado en Almacén Grande.`);
-                }
-                guardarSilencioso();
-                renderAll();
-            }
-        }
-
-        window.completarReabastecimiento = function() {
-            const surtidos = [];
-            inventario.forEach(prod => {
-                if (!prod.agotadoGrande && prod.cantidadActual < prod.stockObjetivo) {
-                    surtidos.push(`${prod.nombre} (surtido a ${prod.stockObjetivo})`);
-                    prod.cantidadActual = prod.stockObjetivo;
-                }
+            // Aplicar filtros cruzados (Buscador + Estante Seleccionado)
+            const productosFiltrados = inventario.filter(prod => {
+                const cumpleEstante = (filtroEstanteActual === 'todos' || prod.ubicacion === filtroEstanteActual);
+                const cumpleBusqueda = prod.nombre.toLowerCase().includes(textoBusquedaActual) || 
+                                       prod.categoria.toLowerCase().includes(textoBusquedaActual);
+                return cumpleEstante && cumpleBusqueda;
             });
 
-            if (surtidos.length > 0) {
-                showToast("📦 ¡Surtido Completado! El Almacén Chico se niveló correctamente.");
-                guardarSilencioso();
-            } else {
-                showToast("No hay elementos pendientes para surtir internamente.", "warning");
-            }
-            renderAll();
-        }
-
-        function renderCompras() {
-            const tbody = document.getElementById('tabla-compras-body');
-            const vacioCompras = document.getElementById('vacio-compras');
-            tbody.innerHTML = '';
-
-            const comprasExternas = inventario.filter(prod => prod.agotadoGrande && (prod.stockObjetivo - prod.cantidadActual) > 0);
-
-            if (comprasExternas.length === 0) {
-                vacioCompras.classList.remove('hidden');
-            } else {
-                vacioCompras.classList.add('hidden');
-
-                comprasExternas.forEach(prod => {
-                    const dif = prod.stockObjetivo - prod.cantidadActual;
-                    const fila = document.createElement('tr');
-                    fila.className = "hover:bg-rose-50/20 transition-colors duration-150 bg-rose-50/10";
-                    
-                    fila.innerHTML = `
-                        <td class="py-4 px-4 font-extrabold text-slate-800 text-base">${prod.nombre}</td>
-                        <td class="py-4 px-4">
-                            <span class="px-2.5 py-1 bg-rose-100 text-rose-800 border border-rose-200 rounded-lg text-xs font-bold">${prod.categoria}</span>
+            if (productosFiltrados.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="p-8 text-center text-slate-400 font-medium">
+                            <div class="flex flex-col items-center gap-2">
+                                <i data-lucide="package-open" class="w-8 h-8 text-slate-300"></i>
+                                No se encontraron productos en este apartado.
+                            </div>
                         </td>
-                        <td class="py-4 px-4 text-center text-slate-600 font-semibold">${prod.unidad}</td>
-                        <td class="py-4 px-4 text-center font-black text-rose-600 text-base">Faltan ${dif}</td>
-                        <td class="py-4 px-4 text-right">
-                            <button onclick="reabastecerGrandeDirecto(${prod.id})" class="px-3 py-1.5 bg-emerald-50 text-emerald-700 border-2 border-emerald-200 hover:bg-emerald-100 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 ml-auto shadow-sm">
-                                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
-                                Ya se compró
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(fila);
-                });
-            }
-        }
-
-        window.reabastecerGrandeDirecto = function(id) {
-            const prod = inventario.find(p => p.id === id);
-            if (prod) {
-                prod.agotadoGrande = false;
-                prod.cantidadActual = prod.stockObjetivo;
-                showToast(`🛒 "${prod.nombre}" comprado y surtido al Almacén Chico.`);
-                guardarSilencioso();
-                renderAll();
-            }
-        }
-
-        window.copiarListaCompras = function() {
-            const compras = inventario.filter(prod => prod.agotadoGrande && (prod.stockObjetivo - prod.cantidadActual) > 0);
-            if (compras.length === 0) {
-                showToast("No hay elementos en la lista de compras externa.");
+                    </tr>
+                `;
+                lucide.createIcons();
                 return;
             }
 
-            let texto = "🛒 *LISTA DE COMPRAS - MOVIMIENTO RAS* 🛒\n";
-            texto += "===================================\n";
-            compras.forEach(prod => {
-                const dif = prod.stockObjetivo - prod.cantidadActual;
-                texto += `• *${prod.nombre}* (${prod.categoria}): Falta comprar *${dif} ${prod.unidad}* para ${prod.ubicacion}\n`;
-            });
-            texto += "===================================\n";
-            texto += "¡Gracias por apoyar a nuestros niños! 💛";
+            productosFiltrados.forEach(prod => {
+                const falta = Math.max(0, prod.stockObjetivo - prod.cantidadActual);
+                
+                // Configurar etiquetas de estatus visuales
+                let badgeEstatus = '';
+                if (prod.cantidadActual === 0) {
+                    badgeEstatus = `<span class="inline-flex items-center gap-1 bg-rose-50 text-rose-600 text-[11px] font-bold px-2.5 py-1 rounded-full border border-rose-100"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span> Vacío (-${prod.stockObjetivo})</span>`;
+                } else if (prod.cantidadActual < prod.stockObjetivo) {
+                    badgeEstatus = `<span class="inline-flex items-center bg-amber-50 text-amber-700 text-[11px] font-bold px-2.5 py-1 rounded-full border border-amber-100">Incompleto</span>`;
+                } else {
+                    badgeEstatus = `<span class="inline-flex items-center bg-teal-50 text-teal-700 text-[11px] font-bold px-2.5 py-1 rounded-full border border-teal-100">✓ Lleno</span>`;
+                }
 
-            const el = document.createElement('textarea');
-            el.value = texto;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-
-            showToast("📋 Lista de compras copiada para mandar por WhatsApp.");
-        }
-
-        function renderCatalogo() {
-            const tbody = document.getElementById('tabla-catalogo-body');
-            tbody.innerHTML = '';
-
-            inventario.forEach(prod => {
                 const fila = document.createElement('tr');
-                fila.className = "hover:bg-slate-50 transition-colors duration-150";
+                fila.className = "hover:bg-slate-50/50 transition duration-150";
                 fila.innerHTML = `
-                    <td class="py-3 px-4 font-bold text-slate-800 text-base">${prod.nombre}</td>
-                    <td class="py-3 px-4 text-slate-600 font-semibold">${prod.categoria}</td>
-                    <td class="py-3 px-4">
-                        <span class="px-2.5 py-1 bg-purple-50 text-purple-700 border border-purple-100 rounded-lg text-xs font-bold">${prod.ubicacion}</span>
+                    <td class="p-4">
+                        <p class="font-bold text-slate-900">${prod.nombre}</p>
+                        <p class="text-xs text-slate-400 font-medium">${prod.categoria} • ${prod.unidad}</p>
                     </td>
-                    <td class="py-3 px-4 text-center font-black text-slate-700 text-base">${prod.stockObjetivo}</td>
-                    <td class="py-3 px-4 text-right">
-                        <button onclick="confirmarEliminarProducto(${prod.id})" class="text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition">
-                            <i data-lucide="trash" class="w-4 h-4"></i>
-                        </button>
+                    <td class="p-4">
+                        <span class="text-xs bg-slate-100 text-slate-600 font-semibold px-2.5 py-1 rounded-lg">${prod.ubicacion}</span>
+                    </td>
+                    <td class="p-4 text-center font-bold text-slate-500">${prod.stockObjetivo}</td>
+                    <td class="p-4">
+                        <div class="flex items-center justify-center gap-3">
+                            <button onclick="window.cambiarCantidad(${prod.id}, -1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold transition active:scale-90">-</button>
+                            <span class="w-6 text-center font-extrabold text-base text-slate-900">${prod.cantidadActual}</span>
+                            <button onclick="window.cambiarCantidad(${prod.id}, 1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold transition active:scale-90">+</button>
+                        </div>
+                    </td>
+                    <td class="p-4 text-center">${badgeEstatus}</td>
+                    <td class="p-4 text-center font-extrabold ${falta > 0 ? 'text-rose-600' : 'text-slate-400'}">
+                        ${falta > 0 ? `Llevar ${falta}` : '—'}
                     </td>
                 `;
                 tbody.appendChild(fila);
             });
-        }
 
-        window.agregarProducto = function(event) {
-            event.preventDefault();
-            const textfield_name = document.getElementById('add-nombre');
-            const nombre = textfield_name.value.trim();
-            const categoria = document.getElementById('add-categoria').value.trim();
-            const ubicacion = document.getElementById('add-ubicacion').value;
-            const stock = parseInt(document.getElementById('add-stock').value);
+            // Re-renderizar iconos de Lucide cargados dinámicamente
+            lucide.createIcons();
+        };
 
-            if (!nombre || !categoria || isNaN(stock) || stock <= 0) {
-                return;
+        // FUNCIÓN GLOBAL: GENERACIÓN Y EXPORTACIÓN DE REPORTES EN PDF PROFESIONALES
+        window.exportarPDF = function(tipo) {
+            const { jsPDF } = window.jspdf;
+            const docPDF = new jsPDF('p', 'pt', 'a4');
+            const fechaActual = new Date().toLocaleDateString('es-MX');
+
+            // 1. ENCABEZADO OFICIAL DE MOVIMIENTO RAS
+            docPDF.setFillColor(225, 29, 116); // Color Rosa RAS (#e11d74)
+            docPDF.rect(0, 0, 595, 75, 'F');
+
+            docPDF.setTextColor(255, 255, 255);
+            docPDF.setFont("helvetica", "bold");
+            docPDF.setFontSize(18);
+            docPDF.text("FUNDACIÓN MOVIMIENTO RAS", 35, 34);
+            
+            docPDF.setFontSize(10);
+            docPDF.setFont("helvetica", "normal");
+            docPDF.text("Sistema de Auditoría y Control de Doble Almacén", 35, 52);
+            docPDF.text(`Fecha: ${fechaActual}`, 480, 44);
+
+            // 2. FILTRAR DATOS PARA LAS TABLAS DEL PDF
+            let productosParaPDF = [...inventario];
+            if (tipo === 'chico') {
+                // El reporte de Almacén Chico solo muestra lo que falta surtir
+                productosParaPDF = inventario.filter(p => (p.stockObjetivo - p.cantidadActual) > 0);
             }
 
-            const nuevoId = inventario.length > 0 ? Math.max(...inventario.map(p => p.id)) + 1 : 1;
-            const nuevoProd = {
-                id: nuevoId,
-                nombre: nombre,
-                categoria: categoria,
-                unidad: "Pzs",
-                stockObjetivo: stock,
-                cantidadActual: 0,
-                ubicacion: ubicacion,
-                agotadoGrande: false
-            };
-baseDeDatos.ref('productos').push(nuevoProd);
-            inventario.push(nuevoProd);
-            window.inventario = inventario;
-            guardarSilencioso();
-            renderAll();
+            // Separar el reporte en tres tablas organizadas por su estatus actual
+            const productosVacios = productosParaPDF.filter(p => p.cantidadActual === 0);
+            const productosIncompletos = productosParaPDF.filter(p => p.cantidadActual > 0 && p.cantidadActual < p.stockObjetivo);
+            const productosLlenos = productosParaPDF.filter(p => p.cantidadActual >= p.stockObjetivo);
+
+            let coordenadaYActual = 110;
+
+            const columnasTabla = ["Producto / Categoría", "Ubicación", "Objetivo", "Actual", "Acción Requerida"];
+
+            // FUNCIÓN AUXILIAR INTERNA PARA IMPRIMIR SECCIONES EN EL PDF
+            function construirSeccionTabla(tituloSeccion, listadoProductos, colorRGB) {
+                if (listadoProductos.length === 0) return;
+
+                docPDF.setFillColor(248, 250, 252);
+                docPDF.rect(35, coordenadaYActual - 15, 525, 22, 'F');
+
+                docPDF.setTextColor(colorRGB[0], colorRGB[1], colorRGB[2]);
+                docPDF.setFont("helvetica", "bold");
+                docPDF.setFontSize(11);
+                docPDF.text(tituloSeccion, 42, coordenadaYActual);
+
+                const filasDatos = listadoProductos.map(p => {
+                    const diferencia = p.stockObjetivo - p.cantidadActual;
+                    const accionText = diferencia > 0 ? `Faltan ${diferencia} ${p.unidad}` : "Surtido Completo";
+                    return [
+                        `${p.nombre}\n(${p.categoria})`,
+                        p.ubicacion,
+                        `${p.stockObjetivo} pzs`,
+                        `${p.cantidadActual} pzs`,
+                        accionText
+                    ];
+                });
+
+                docPDF.autoTable({
+                    head: [columnasTabla],
+                    body: filasDatos,
+                    startY: coordenadaYActual + 8,
+                    margin: { left: 35, right: 35 },
+                    theme: 'striped',
+                    styles: { fontSize: 9, cellPadding: 6 },
+                    headStyles: { fillColor: colorRGB, fontStyle: 'bold', textALign: 'center' },
+                    columnStyles: {
+                        0: { cellWidth: 150 },
+                        1: { cellWidth: 120 },
+                        2: { cellWidth: 60, halign: 'center' },
+                        3: { cellWidth: 60, halign: 'center' },
+                        4: { cellWidth: 135, fontStyle: 'bold' }
+                    }
+                });
+
+                coordenadaYActual = docPDF.lastAutoTable.finalY + 35;
+            }
+
+            // Construir de forma secuencial las tres tablas del reporte
+            construirSeccionTabla("1. ESTANTES COMPLETAMENTE VACÍOS (URGENTE)", productosVacios, [220, 38, 38]);
+            construirSeccionTabla("2. PRODUCTOS CON STOCK INSUFICIENTE (POR SURTIR)", productosIncompletos, [217, 119, 6]);
             
-            document.getElementById('form-nuevo-producto').reset();
-            showToast(`✨ "${nombre}" agregado con éxito al catálogo.`);
-        }
+            if (tipo === 'general') {
+                construirSeccionTabla("3. PRODUCTOS CON INVENTARIO ÓPTIMO", productosLlenos, [13, 148, 136]);
+            }
 
-        function actualizarResumenNumerico() {
-            const escasos = inventario.filter(p => (p.stockObjetivo - p.cantidadActual) > 0 && !p.agotadoGrande).length;
-            const unidadesATrasladar = inventario.reduce((acc, p) => {
-                if (!p.agotadoGrande && p.cantidadActual < p.stockObjetivo) {
-                    return acc + (p.stockObjetivo - p.cantidadActual);
-                }
-                return acc;
-            }, 0);
-            const agotadosGrande = inventario.filter(p => p.agotadoGrande && (p.stockObjetivo - p.cantidadActual) > 0).length;
+            // Pie de página oficial
+            docPDF.setFontSize(8);
+            docPDF.setTextColor(148, 163, 184);
+            docPDF.text("Este reporte fue generado de forma automatizada por el Sistema de Inventario Movimiento RAS.", 35, 810);
 
-            document.getElementById('cant-escasos').innerText = escasos;
-            document.getElementById('cant-unidades-traslado').innerText = unidadesATrasladar;
-            document.getElementById('cant-agotados-grande').innerText = agotadosGrande;
-        }
+            // Descargar el documento procesado
+            const nombreLimpioFecha = fechaActual.replace(/\//g, '-');
+            docPDF.save(`Reporte_Inventario_RAS_${tipo}_${nombreLimpioFecha}.pdf`);
+            window.showToast("📄 Reporte en PDF generado y descargado con éxito.");
+        };
 
-        // --- SISTEMA DE TOASTS ---
+        // FUNCIÓN GLOBAL: LANZADOR DE NOTIFICACIONES TOAST ESTILIZADAS
         window.showToast = function(mensaje) {
             const container = document.getElementById('toast-container');
-            const text = document.getElementById('toast-text');
-            
-            text.innerHTML = mensaje;
-            container.classList.remove('hidden');
-            container.classList.add('flex');
-            
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = "bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 animate-slide-in pointer-events-auto min-w-[200px]";
+            toast.innerHTML = `
+                <i data-lucide="check-circle" class="w-4 h-4 text-teal-400 flex-shrink-0"></i>
+                <span>${mensaje}</span>
+            `;
+            container.appendChild(toast);
+            lucide.createIcons();
+
             setTimeout(() => {
-                closeToast();
-            }, 5000);
-        }
-
-        window.closeToast = function() {
-            const container = document.getElementById('toast-container');
-            container.classList.add('hidden');
-            container.classList.remove('flex');
-        }
-
-       
+                toast.classList.add('opacity-0', 'translate-y-2', 'transition', 'duration-300');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        };
     </script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-
-<script>
-  // 2. CREDENCIALES: Tus llaves oficiales de conexión
-  const firebaseConfig = {
-    apiKey: "AIzaSyAzvOL45raHirjvHmRb6_3lKFcm7BQ0KQE",
-    authDomain: "movimiento-ras-74e7c.firebaseapp.com",
-    databaseURL: "https://movimiento-ras-74e7c-default-rtdb.firebaseio.com",
-    projectId: "movimiento-ras-74e7c",
-    storageBucket: "movimiento-ras-74e7c.firebasestorage.app",
-    messagingSenderId: "548240435431",
-    appId: "1:548240435431:web:833fd742992d2ca1195a42"
-  };
-
-  // 3. INICIALIZACIÓN: Creamos la variable global baseDeDatos
-  firebase.initializeApp(firebaseConfig);
-
-// 4. ESCUCHADORES EN TIEMPO REAL: Traer los datos de internet
-// Sincronización completa con Firebase en tiempo real
-  window.initFirebase = function() {
-      z
-     // 1. Escuchar e importar los PRODUCTOS de la nube de forma inteligente
-      baseDeDatos.ref('productos').on('value', (snapshot) => {
-          const datosNube = snapshot.val();
-          
-          // Convertimos lo que haya en la nube a un arreglo
-          const listaNube = datosNube ? Object.values(datosNube) : [];
-
-          // TRUCO: Si la nube está vacía o tiene menos productos que tu app local,
-          // usamos e imponemos el inventario base de la app para que no se borre.
-          if (listaNube.length > 1) {
-              window.inventario = listaNube;
-          } else {
-              // Si la nube está casi vacía, le subimos todo el catálogo completo de la app
-              if (window.inventario && window.inventario.length > 1) {
-                  baseDeDatos.ref('productos').set(window.inventario);
-              }
-          }
-          
-          if (typeof window.renderAll === 'function') {
-              window.renderAll();
-          }
-      });
-
-      // 2. Escuchar e importar los MOVIMIENTOS de la nube
-      baseDeDatos.ref('movimientos').on('value', (snapshot) => {
-          const datosNube = snapshot.val();
-          window.movimientos = datosNube ? Object.values(datosNube) : [];
-          
-          if (typeof window.renderTable === 'function') {
-              window.renderTable();
-          } else if (typeof window.actualizarTabla === 'function') {
-              window.actualizarTabla();
-          }
-      });
-
-      
-
-      // Escuchar Historial de Movimientos
-      baseDeDatos.ref('movimientos').on('value', (snapshot) => {
-          const datosNube = snapshot.val();
-          window.movimientos = datosNube ? Object.values(datosNube) : [];
-          if (typeof window.renderTable === 'function') {
-              window.renderTable();
-          } else if (typeof window.actualizarTabla === 'function') {
-              window.actualizarTabla();
-          }
-      });
-  };
-
-  // 5. EJECUCIÓN: Arrancamos la sincronización activa
-  initFirebase();
-</script>
 </body>
-</html> 
+</html>
