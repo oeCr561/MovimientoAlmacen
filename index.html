@@ -181,7 +181,7 @@
                 <form id="form-nuevo-producto" onsubmit="window.agregarProductoManual(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
                     <input type="text" id="add-nombre" placeholder="Nombre (ej. Cloro)" required class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-pink-500 font-medium w-full">
                     <input type="text" id="add-categoria" placeholder="Categoría (ej. Limpieza)" required class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-pink-500 font-medium w-full">
-                    <input type="text" id="add-unidad" placeholder="Unidad (ej. Pzs, Latas)" required class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-pink-500 font-medium w-full">
+                    <input type="text" id="add-unidad" placeholder="Unidad (ej. Pzs)" required class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-pink-500 font-medium w-full">
                    
                     <select id="add-ubicacion" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-pink-500 text-slate-600 font-medium w-full">
                         <option value="Almacena (General)">📦 Almacena (General)</option>
@@ -212,17 +212,17 @@
 
             <div id="contenedor-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
-            <div id="seccion-bitacora" style="display: none;" class="bg-slate-900 text-slate-100 p-5 rounded-2xl border border-slate-800 shadow-lg space-y-4 mt-6">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <div class="flex items-center gap-2 text-amber-400 font-bold text-sm uppercase tracking-wider">
-                        <i data-lucide="activity" class="w-4 h-4"></i>
+            <div id="seccion-bitacora" style="display: none;" class="bg-pink-50 text-slate-800 p-5 rounded-3xl border-2 border-pink-100 shadow-lg space-y-4 mt-6">
+                <div class="flex items-center justify-between border-b border-pink-200 pb-3">
+                    <div class="flex items-center gap-2 text-pink-700 font-black text-sm uppercase tracking-wider">
+                        <i data-lucide="activity" class="w-4 h-4 text-pink-600"></i>
                         <span>Bitácora / Historial de Movimientos Recientes</span>
                     </div>
-                    <button onclick="window.limpiarBitacoraTurno()" class="bg-slate-800 hover:bg-rose-950 text-slate-300 hover:text-rose-400 font-bold text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-lg border border-slate-700 hover:border-rose-900 transition flex items-center gap-1">
+                    <button onclick="window.limpiarBitacoraTurno()" class="bg-white hover:bg-rose-50 text-pink-600 hover:text-rose-700 font-bold text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-xl border border-pink-200 shadow-sm transition flex items-center gap-1 active:scale-95">
                         <i data-lucide="trash" class="w-3.5 h-3.5"></i> Limpiar Turno
                     </button>
                 </div>
-                <div id="lista-bitacora" class="space-y-2 max-h-60 overflow-y-auto pr-2 text-xs font-mono division-y division-slate-800/50 no-scrollbar">
+                <div id="lista-bitacora" class="space-y-2 max-h-60 overflow-y-auto pr-2 text-xs font-medium no-scrollbar">
                     </div>
             </div>
         </main>
@@ -242,8 +242,6 @@
         let filtroEstanteActual = 'todos';
         let textoBusquedaActual = '';
         let rolUsuarioActual = 'Encargado Almacén Chico';
-        
-        // Variables añadidas para la identificación personalizada del encargado
         let nombreEncargadoActual = 'Encargado Anónimo';
 
         const DATA_INICIAL = [
@@ -272,7 +270,6 @@
 
         window.dbRealtimeInstance = dbRealtime;
 
-        // Persistencia Inicial (LocalStorage Híbrido)
         const localCachedData = localStorage.getItem('inventario_ras');
         if (localCachedData) {
             inventario = JSON.parse(localCachedData);
@@ -288,12 +285,10 @@
             nombreEncargadoActual = savedNombre;
         }
 
-        // Escuchador de Autenticación de Firebase
         onAuthStateChanged(auth, async (authUser) => {
             if (authUser && savedUsr) {
                 rolUsuarioActual = savedUsr;
                
-                // Configuración dinámica de la cabecera visual del usuario
                 if (rolUsuarioActual === 'Coordinador General') {
                     document.getElementById('usr-actual').innerText = rolUsuarioActual;
                 } else {
@@ -334,12 +329,10 @@
             }
         });
 
-        // Robustez: Guardado Centralizado en LocalStorage
         window.guardarEnLocalStorage = function() {
             localStorage.setItem('inventario_ras', JSON.stringify(inventario));
         };
 
-        // Control Estricto de Roles por Pantalla (CSS Ocultación por JS)
         window.actualizarVisibilidadPanelesYBitacora = function() {
             const panelAgregar = document.getElementById('panel-agregar-producto');
             const seccionBitacora = document.getElementById('seccion-bitacora');
@@ -353,7 +346,6 @@
             }
         };
 
-        // Solicitar e Identificar encargado de forma personalizada si el rol cambia en el login
         window.actualizarRolPrevioLogin = function() {
             rolUsuarioActual = document.getElementById('login-usuario').value;
             if (rolUsuarioActual !== 'Coordinador General') {
@@ -367,12 +359,10 @@
             }
         };
 
-        // Motor Cronológico de Logs con Inyección de Identidad Completa
         window.registrarLogAccion = function(accionTexto) {
             const ahora = new Date();
             const horaExacta = ahora.toTimeString().split(' ')[0];
             
-            // Construcción del emisor contextual según especificaciones del requerimiento #7
             let emisorContexto = rolUsuarioActual;
             if (rolUsuarioActual !== 'Coordinador General') {
                 let abreviacionRol = rolUsuarioActual === 'Encargado Almacén Chico' ? 'Encargado Chico' : 'Encargado Grande';
@@ -400,25 +390,25 @@
             if (!contenedorLogs) return;
 
             if (bitacoraLogs.length === 0) {
-                contenedorLogs.innerHTML = `<p class="text-slate-500 italic p-2">No hay acciones registradas en el historial de este turno.</p>`;
+                contenedorLogs.innerHTML = `<p class="text-pink-400 italic p-2 text-center">No hay acciones registradas en este turno.</p>`;
                 return;
             }
 
+            // Inyección limpia y con colores rosas institucionales
             contenedorLogs.innerHTML = bitacoraLogs.map(log => `
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 p-2 border-b border-slate-800/40 hover:bg-slate-800/30 transition rounded-lg">
-                    <div class="flex items-center gap-2">
-                        <span class="text-pink-400 font-bold">[${log.hora}]</span>
-                        <span class="text-amber-400 font-semibold bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 text-[10px]">${log.rol}</span>
-                        <span class="text-slate-200">${log.descripcion}</span>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 p-2.5 bg-white border border-pink-100 rounded-xl shadow-sm transition hover:scale-[1.005]">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-pink-600 font-bold font-mono bg-pink-100/50 px-2 py-0.5 rounded-lg">[${log.hora}]</span>
+                        <span class="text-amber-700 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-100 text-[10px] font-bold">${log.rol}</span>
+                        <span class="text-slate-700 font-medium ml-1">${log.descripcion}</span>
                     </div>
                 </div>
             `).join('');
         };
 
-        // Función Especial Administrativa: Limpiar Turno
         window.limpiarBitacoraTurno = function() {
             if (rolUsuarioActual !== 'Coordinador General') return;
-            if (confirm("🧹 ¿Deseas limpiar la bitácora? Esta acción vaciará el historial para iniciar un nuevo turno de trabajo.")) {
+            if (confirm("🧹 ¿Deseas limpiar la bitácora? Esta acción vaciará el historial para iniciar un nuevo turno.")) {
                 bitacoraLogs = [];
                 localStorage.setItem('bitacora_ras', JSON.stringify(bitacoraLogs));
                 window.renderBitacoraHTML();
@@ -429,7 +419,6 @@
             }
         };
 
-        // Flujo Navegacional entre Pestañas Logísticas
         window.cambiarPestaña = function(pestaña) {
             pestañaActual = pestaña;
             const pestañasDisponibles = { 'auditoria': 'tab-auditoria', 'relleno': 'tab-relleno', 'super': 'tab-super' };
@@ -447,7 +436,6 @@
             window.renderAll();
         };
 
-        // Conexión del Buscador por Texto y Filtros por Botón de Estante
         window.handleBuscar = function() {
             textoBusquedaActual = document.getElementById('buscador').value.toLowerCase();
             window.renderAll();
@@ -470,12 +458,10 @@
             window.renderAll();
         };
 
-        // Operaciones de Inventario con Bloqueo de Stock Mínimo >= 0
         window.cambiarCantidad = function(id, factor) {
             const prod = inventario.find(p => p.id === id);
             if (prod) {
                 const nuevaCant = prod.cantidadActual + factor;
-                // Validación estricta anti-negativos
                 if (nuevaCant >= 0) {
                     prod.cantidadActual = nuevaCant;
                     window.registrarLogAccion(`Modificó stock de "${prod.nombre}": ${prod.cantidadActual} pzs en Almacén Chico.`);
@@ -500,7 +486,6 @@
             }
         };
 
-        // Lógica de la Tarjeta Amarilla (KPI) y Envío Automatizado a Lista de Súper
         window.marcarAgotadoEnGrande = function(id, nombre) {
             const prod = inventario.find(p => p.id === id);
             if (prod) {
@@ -525,35 +510,32 @@
             }
         };
 
-        // Función de Administración Avanzada: Relleno Masivo Síncrono
         window.ejecutarRellenoMasivo = function() {
             if (rolUsuarioActual !== 'Coordinador General') return;
             if (confirm("⚡ ¿Estás seguro de que deseas reabastecer masivamente todo el inventario al 100%?")) {
                 inventario.forEach(prod => {
-                    prod.cantidadActual = prod.stockObjetivo; // stockChico = metaChico
-                    prod.agotadoGrande = false;              // Limpieza de estados 'Agotado en Grande'
+                    prod.cantidadActual = prod.stockObjetivo;
+                    prod.agotadoGrande = false;
                 });
                 
-                // Registro destacado e inequívoco en la bitácora
                 window.registrarLogAccion("Coordinador General realizó un reabastecimiento masivo de todo el inventario.");
                 
                 window.guardarEnLocalStorage();
-                window.renderAll(); // Actualiza KPI superiores y tarjetas en tiempo real
+                window.renderAll();
                 window.guardarSilenciosoNube();
                 window.showToast("⚡ Reabastecimiento masivo completado con éxito.");
             }
         };
 
-        // Botón de Pánico
         window.ejecutarBotonPanico = function() {
             if (rolUsuarioActual !== 'Coordinador General') return;
-            if (confirm("🚨 ¿Deseas activar el Botón de Pánico? Esto vaciará por completo el Almacén Chico para forzar una auditoría urgente.")) {
+            if (confirm("🚨 ¿Deseas activar el Botón de Pánico? Todo el Almacén Chico se reducirá a cero.")) {
                 inventario.forEach(p => p.cantidadActual = 0);
                 window.registrarLogAccion("¡ACTIVÓ EL BOTÓN DE PÁNICO! Todo el inventario del Almacén Chico se redujo a cero.");
                 window.guardarEnLocalStorage();
                 window.renderAll();
                 window.guardarSilenciosoNube();
-                window.showToast("🚨 Estado de pánico activado. Inventario Chico en ceros.");
+                window.showToast("🚨 Estado de pánico activado.");
             }
         };
 
@@ -590,7 +572,7 @@
 
         window.eliminarProducto = function(id, nombre) {
             if (rolUsuarioActual !== 'Coordinador General') return;
-            if (confirm(`¿Estás seguro de que deseas eliminar por completo "${nombre}" del sistema?`)) {
+            if (confirm(`¿Estás seguro de que deseas eliminar por completo "${nombre}"?`)) {
                 inventario = inventario.filter(prod => prod.id !== id);
                 window.registrarLogAccion(`Eliminó el producto "${nombre}" del catálogo.`);
                 window.guardarEnLocalStorage();
@@ -600,7 +582,6 @@
             }
         };
 
-        // Renderizado Reactivo y Cálculo Dinámico de KPIs
         window.renderAll = function() {
             const contenedor = document.getElementById('contenedor-productos');
             if (!contenedor) return;
@@ -614,7 +595,7 @@
                 if (p) {
                     if (p.cantidadActual >= p.stockObjetivo) contAlDia++;
                     if (p.cantidadActual === 0) contFaltantesChico++;
-                    if (p.agotadoGrande === true) contAgotadoGrande++; // Conexión síncrona KPI Amarillo
+                    if (p.agotadoGrande === true) contAgotadoGrande++;
                 }
             });
 
@@ -622,7 +603,6 @@
             document.getElementById('kpi-faltantes').innerText = contFaltantesChico;
             document.getElementById('kpi-agotado-grande').innerText = contAgotadoGrande;
 
-            // Motor de Filtrado Cruzado Integrado
             let productosFiltrados = inventario.filter(prod => {
                 if (!prod) return false;
                 const cumpleEstante = (filtroEstanteActual === 'todos' || prod.ubicacion === filtroEstanteActual);
@@ -630,7 +610,6 @@
                 return cumpleEstante && cumpleBusqueda;
             });
 
-            // Segmentación por Pestañas Logísticas
             if (pestañaActual === 'relleno') {
                 productosFiltrados = productosFiltrados.filter(p => p.cantidadActual < p.stockObjetivo);
             } else if (pestañaActual === 'super') {
@@ -746,7 +725,6 @@
             lucide.createIcons();
         };
 
-        // Motor de PDF de Alta Fidelidad de 4 Tablas Cromáticas Independientes
         window.exportarPDF4Tablas = function() {
             const { jsPDF } = window.jspdf;
             const docPDF = new jsPDF('p', 'pt', 'a4');
@@ -797,7 +775,6 @@
                 coordenadaYActual = docPDF.lastAutoTable.finalY + 35;
             }
 
-            // Mapeos Estrictos de Información Requerida para las 4 Tablas Cromáticas
             const filasT1 = inventario.map(p => [
                 p.nombre, p.categoria, p.ubicacion, `${p.stockObjetivo} ${p.unidad}`, `${p.cantidadActual} ${p.unidad}`, p.agotadoGrande ? "AGOTADO EN CENTRAL" : "DISPONIBLE"
             ]);
@@ -816,26 +793,25 @@
                 p.nombre, p.categoria, "Orden de Adquisición Urgente para Proveedor"
             ]);
 
-            // Inyecciones Secuenciales Con Colores Firmados
             inyectarTablaModularPDF(
                 "Tabla 1: Inventario General (Todos los Productos del Sistema)",
                 filasT1,
                 ["Nombre del Artículo", "Categoría", "Estante Asignado", "Meta Chico", "Existencia Chico", "Estatus Grande"],
-                "#8E44AD" // MORADA
+                "#8E44AD"
             );
 
             inyectarTablaModularPDF(
                 "Tabla 2: Productos Faltantes - Estante Chico (En Cero)",
                 filasT2,
                 ["Nombre del Artículo", "Categoría", "Estante Asignado", "Meta Requerida", "Estatus Crítico"],
-                "#2980B9" // AZUL
+                "#2980B9"
             );
 
             inyectarTablaModularPDF(
                 "Tabla 3: Productos Faltantes - Estante Grande (Incidencias)",
                 filasT3,
                 ["Nombre del Artículo", "Categoría", "Ubicación Geográfica", "Incidencia Registrada"],
-                "#F1C40F", // AMARILLA
+                "#F1C40F", 
                 true
             );
 
@@ -843,7 +819,7 @@
                 "Tabla 4: Lista para Comprar - Estante Grande (Formato Proveedor)",
                 filasT4,
                 ["Insumo Solicitado", "Segmento / Categoría", "Instrucciones de Compra"],
-                "#E91E63" // ROSA
+                "#E91E63"
             );
 
             docPDF.setFontSize(8); 
@@ -855,7 +831,6 @@
             window.showToast("📄 Reporte estructural de 4 tablas generado con éxito.");
         };
 
-        // Autenticación de Usuarios
         window.handleLogin = async function(e) {
             if (e && e.preventDefault) e.preventDefault();
 
@@ -884,7 +859,6 @@
                     }
                 }
 
-                // Ajuste de interfaz en la cabecera del usuario activo
                 if (rolUsuarioActual === 'Coordinador General') {
                     document.getElementById('usr-actual').innerText = rolUsuarioActual;
                 } else {
