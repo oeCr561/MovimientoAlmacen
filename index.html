@@ -12,7 +12,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 
-
     <style>
         @import url('https://fonts.googleapis.com/css?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         body {
@@ -27,8 +26,15 @@
         .alerta-vacio {
             animation: pulso-critico 2s infinite ease-in-out;
         }
+        /* Utilidad para ocultar barra de scroll en los contenedores de pestañas */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
-
 
     <script>
         window.showSvgFallback = function(imgElement) {
@@ -39,7 +45,6 @@
     </script>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-pink-200">
-
 
     <div id="login-screen" class="flex-1 flex items-center justify-center p-4 min-h-screen bg-gradient-to-br from-pink-50 via-slate-50 to-sky-50">
         <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-slate-100 max-w-md w-full text-center space-y-6">
@@ -53,7 +58,6 @@
                 <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-2">Movimiento <span class="text-pink-600">RAS</span></h1>
                 <p class="text-slate-500 text-xs sm:text-sm mt-1">Control de Inventario Doble Almacén</p>
             </div>
-
 
             <form id="login-form" onsubmit="window.handleLogin(event)" class="space-y-4 text-left">
                 <div>
@@ -72,7 +76,6 @@
                     <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0"></i> PIN Incorrecto para el usuario seleccionado.
                 </div>
 
-
                 <button type="submit" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 shadow-md shadow-pink-600/20 active:scale-[0.98] text-sm">
                     Entrar al Inventario
                 </button>
@@ -80,7 +83,6 @@
             <p class="text-[11px] sm:text-xs text-slate-400">Uniendo voluntades para apoyar a los niños con cáncer 💛</p>
         </div>
     </div>
-
 
     <div id="app-screen" class="hidden flex-1 flex-col min-h-screen">
         <header class="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm px-4 py-3">
@@ -104,7 +106,6 @@
                     <button onclick="window.filtrarEstante('Mueble de Madera')" id="btn-estante-madera" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition text-slate-600 hover:text-sky-600">🪵 Mueble de Madera</button>
                 </div>
 
-
                 <div class="hidden md:flex items-center gap-3">
                     <div class="text-right">
                         <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Sesión iniciada por:</p>
@@ -117,9 +118,52 @@
             </div>
         </header>
 
+        <div class="bg-white border-b border-slate-200 shadow-sm">
+            <div class="max-w-7xl mx-auto flex gap-1 p-2">
+                <button id="tab-auditoria" onclick="window.cambiarPestaña('auditoria')" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold border transition bg-pink-600 text-white border-pink-600 shadow-sm">
+                    <i data-lucide="clipboard-list" class="w-4 h-4"></i> Auditoría Chico
+                </button>
+                <button id="tab-relleno" onclick="window.cambiarPestaña('relleno')" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold border transition text-slate-600 border-slate-200 bg-slate-50 hover:bg-slate-100">
+                    <i data-lucide="truck" class="w-4 h-4"></i> Relleno / Reabasto
+                </button>
+                <button id="tab-super" onclick="window.cambiarPestaña('super')" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold border transition text-slate-600 border-slate-200 bg-slate-50 hover:bg-slate-100">
+                    <i data-lucide="shopping-cart" class="w-4 h-4"></i> Lista Súper
+                </button>
+            </div>
+        </div>
 
         <main class="flex-1 max-w-7xl w-full mx-auto p-4 space-y-4">
            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-teal-50 border border-teal-100 p-4 rounded-2xl flex items-center gap-3 shadow-sm">
+                    <div class="bg-teal-500 text-white p-3 rounded-xl">
+                        <i data-lucide="check-check" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-teal-600 uppercase tracking-wider">Al Día (Surtidos)</p>
+                        <h4 id="kpi-al-dia" class="text-2xl font-black text-slate-900 mt-0.5">0</h4>
+                    </div>
+                </div>
+                <div class="bg-rose-50 border border-rose-100 p-4 rounded-2xl flex items-center gap-3 shadow-sm">
+                    <div class="bg-rose-500 text-white p-3 rounded-xl">
+                        <i data-lucide="package-x" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-rose-600 uppercase tracking-wider">Faltantes Estante Chico</p>
+                        <h4 id="kpi-faltantes" class="text-2xl font-black text-slate-900 mt-0.5">0</h4>
+                    </div>
+                </div>
+                <div class="bg-amber-50 border border-amber-100 p-4 rounded-2xl flex items-center gap-3 shadow-sm">
+                    <div class="bg-amber-500 text-white p-3 rounded-xl">
+                        <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-amber-700 uppercase tracking-wider">Agotado en Almacén Grande</p>
+                        <h4 id="kpi-agotado-grande" class="text-2xl font-black text-slate-900 mt-0.5">0</h4>
+                    </div>
+                </div>
+            </div>
+
             <div id="panel-agregar-producto" class="hidden bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm space-y-3">
                 <div class="flex items-center gap-2 text-pink-600 font-extrabold text-sm uppercase tracking-wider">
                     <i data-lucide="plus-circle" class="w-4 h-4"></i>
@@ -135,7 +179,6 @@
                         <option value="Mueble de Madera">🪵 Mueble de Madera</option>
                     </select>
 
-
                     <div class="flex gap-2 w-full">
                         <input type="number" id="add-objetivo" placeholder="Obj." min="1" required class="w-20 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-center focus:outline-none focus:ring-2 focus:ring-pink-500 font-bold">
                         <button type="submit" class="flex-1 bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs py-2 px-3 rounded-xl transition shadow-sm flex items-center justify-center gap-1 active:scale-[0.97]">
@@ -145,7 +188,6 @@
                 </form>
             </div>
 
-
             <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
                 <div class="relative w-full sm:max-w-md">
                     <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4"></i>
@@ -153,48 +195,52 @@
                 </div>
                
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-                    <button onclick="window.exportarPDF('chico')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs py-2 px-3 rounded-xl transition shadow-sm">
-                        <i data-lucide="file-text" class="w-4 h-4"></i> Reporte Chico
-                    </button>
-                    <button onclick="window.exportarPDF('general')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs py-2 px-3 rounded-xl transition shadow-sm">
-                        <i data-lucide="download-cloud" class="w-4 h-4"></i> Reporte Completo
+                    <button onclick="window.exportarPDFEstructural()" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition shadow-sm">
+                        <i data-lucide="download-cloud" class="w-4 h-4"></i> Generar Reporte de Distribución (4 Tablas PDF)
                     </button>
                 </div>
             </div>
 
+            <div id="contenedor-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
-            <div id="contenedor-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div id="seccion-bitacora" style="display: none;" class="bg-slate-900 text-slate-100 p-5 rounded-2xl border border-slate-800 shadow-lg space-y-4 mt-6">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div class="flex items-center gap-2 text-amber-400 font-bold text-sm uppercase tracking-wider">
+                        <i data-lucide="activity" class="w-4 h-4"></i>
+                        <span>Bitácora Interna / Historial de Movimientos Recientes</span>
+                    </div>
+                    <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-md border border-slate-700">Canal Seguro</span>
                 </div>
+                <div id="lista-bitacora" class="space-y-2 max-h-60 overflow-y-auto pr-2 text-xs font-mono division-y division-slate-800/50 no-scrollbar">
+                    </div>
+            </div>
         </main>
     </div>
 
-
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
-
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-
         let auth, dbRealtime;
         let inventario = [];
+        let bitacoraLogs = [];
+        let pestañaActual = 'auditoria'; // Pestañas: auditoria | relleno | super
         let filtroEstanteActual = 'todos';
         let textoBusquedaActual = '';
-        let rolUsuarioActual = 'Encargado Almacén Chico'; // Rol por defecto
-
+        let rolUsuarioActual = 'Encargado Almacén Chico';
 
         const DATA_INICIAL = [
-            { id: 1, nombre: "Leche", categoria: "Lácteos", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 2, cantidadActual: 0 },
-            { id: 2, nombre: "Chiles Jalapeños", categoria: "Enlatados", unidad: "Latas", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 0 },
-            { id: 3, nombre: "Media Cream", categoria: "Lácteos", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 0 },
-            { id: 4, nombre: "Aceite", categoria: "Abarrotes", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 2, cantidadActual: 0 },
-            { id: 5, nombre: "Galleta María", categoria: "Galletas", unidad: "Pzs", ubicacion: "Mueble de Madera", stockObjetivo: 1, cantidadActual: 0 },
-            { id: 6, nombre: "Esponja de lavar trastes", categoria: "Limpieza", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 3, cantidadActual: 0 },
-            { id: 7, nombre: "Jabón para lavar trastes", categoria: "Limpieza", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 0 }
+            { id: 1, nombre: "Leche", categoria: "Lácteos", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 2, cantidadActual: 0, agotadoGrande: false },
+            { id: 2, nombre: "Chiles Jalapeños", categoria: "Enlatados", unidad: "Latas", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 0, agotadoGrande: false },
+            { id: 3, nombre: "Media Cream", categoria: "Lácteos", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 0, agotadoGrande: false },
+            { id: 4, nombre: "Aceite", categoria: "Abarrotes", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 2, cantidadActual: 0, agotadoGrande: true }, // Iniciado para validar contador inicial
+            { id: 5, nombre: "Galleta María", categoria: "Galletas", unidad: "Pzs", ubicacion: "Mueble de Madera", stockObjetivo: 1, cantidadActual: 0, agotadoGrande: false },
+            { id: 6, nombre: "Esponja de lavar trastes", categoria: "Limpieza", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 3, cantidadActual: 0, agotadoGrande: false },
+            { id: 7, nombre: "Jabón para lavar trastes", categoria: "Limpieza", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 0, agotadoGrande: false }
         ];
-
 
         const firebaseConfig = {
             apiKey: "AIzaSyAsX" + "...",
@@ -206,14 +252,11 @@
             appId: "1:89851834241:web:ca43cb397b988f0bc27da7"
         };
 
-
         const app = initializeApp(firebaseConfig);
         auth = getAuth(app);
         dbRealtime = getDatabase(app);
 
-
         window.dbRealtimeInstance = dbRealtime;
-
 
         const savedUsr = localStorage.getItem('ras_usuario_actual');
         const localCachedData = localStorage.getItem('inventario_ras');
@@ -221,6 +264,11 @@
             inventario = JSON.parse(localCachedData);
         }
 
+        // Cargar logs almacenados localmente al iniciar
+        const localCachedLogs = localStorage.getItem('bitacora_ras');
+        if (localCachedLogs) {
+            bitacoraLogs = JSON.parse(localCachedLogs);
+        }
 
         // CONTROLADOR DE PERSISTENCIA Y ROLES EN LA NUBE
         onAuthStateChanged(auth, async (authUser) => {
@@ -232,51 +280,127 @@
                 document.getElementById('app-screen').classList.remove('hidden');
                 document.getElementById('app-screen').classList.add('flex');
 
-
-                // Mostrar formulario de alta SOLAMENTE al Coordinador General
-                const panelAgregar = document.getElementById('panel-agregar-producto');
-                if (rolUsuarioActual === 'Coordinador General') {
-                    panelAgregar.classList.remove('hidden');
-                } else {
-                    panelAgregar.classList.add('hidden');
-                }
-
+                window.actualizarVisibilidadPanelesYBitacora();
 
                 lucide.createIcons();
-
 
                 const productosRef = ref(dbRealtime, 'productos');
                 onValue(productosRef, (snapshot) => {
                     const datosNube = snapshot.val();
                     if (datosNube) {
-                        inventario = Object.values(datosNube).filter(Boolean);
+                        inventario = Object.values(datosNube).filter(Boolean).map(p => ({
+                            ...p,
+                            agotadoGrande: p.agotadoGrande !== undefined ? p.agotadoGrande : false
+                        }));
                         localStorage.setItem('inventario_ras', JSON.stringify(inventario));
                         window.renderAll();
                     } else {
                         set(ref(dbRealtime, 'productos'), DATA_INICIAL);
                     }
                 });
+
+                // Sincronización en tiempo real de logs si existen en la nube
+                const bitacoraRef = ref(dbRealtime, 'bitacora');
+                onValue(bitacoraRef, (snapshot) => {
+                    const logsNube = snapshot.val();
+                    if (logsNube) {
+                        bitacoraLogs = Object.values(logsNube).filter(Boolean);
+                        localStorage.setItem('bitacora_ras', JSON.stringify(bitacoraLogs));
+                        window.renderBitacoraHTML();
+                    }
+                });
             }
         });
 
+        // CONTROL DE ACCESIBILIDAD SEGÚN ROL SELECCIONADO
+        window.actualizarVisibilidadPanelesYBitacora = function() {
+            const panelAgregar = document.getElementById('panel-agregar-producto');
+            const seccionBitacora = document.getElementById('seccion-bitacora');
+
+            if (rolUsuarioActual === 'Coordinador General') {
+                if (panelAgregar) panelAgregar.classList.remove('hidden');
+                if (seccionBitacora) seccionBitacora.style.display = 'block';
+            } else {
+                if (panelAgregar) panelAgregar.classList.add('hidden');
+                if (seccionBitacora) seccionBitacora.style.display = 'none';
+            }
+        };
+
+        // GESTIÓN E INYECCIÓN DE REGISTROS EN LA BITÁCORA
+        window.registrarLogAccion = function(accionTexto) {
+            const ahora = new Date();
+            const horaExacta = ahora.toTimeString().split(' ')[0]; // hh:mm:ss
+            
+            const nuevoLog = {
+                id: Date.now(),
+                hora: horaExacta,
+                rol: rolUsuarioActual,
+                descripcion: accionTexto
+            };
+
+            bitacoraLogs.unshift(nuevoLog); // Insertar al inicio
+            localStorage.setItem('bitacora_ras', JSON.stringify(bitacoraLogs));
+            window.renderBitacoraHTML();
+
+            // Enviar a Firebase Realtime Database de forma silenciosa
+            if (window.dbRealtimeInstance) {
+                set(ref(window.dbRealtimeInstance, 'bitacora'), bitacoraLogs).catch(e => console.error(e));
+            }
+        };
+
+        window.renderBitacoraHTML = function() {
+            const contenedorLogs = document.getElementById('lista-bitacora');
+            if (!contenedorLogs) return;
+
+            if (bitacoraLogs.length === 0) {
+                contenedorLogs.innerHTML = `<p class="text-slate-500 italic">No hay acciones registradas en este turno.</p>`;
+                return;
+            }
+
+            contenedorLogs.innerHTML = bitacoraLogs.map(log => `
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 p-2 border-b border-slate-800/40 hover:bg-slate-800/30 transition rounded-lg">
+                    <div class="flex items-center gap-2">
+                        <span class="text-pink-400 font-bold">[${log.hora}]</span>
+                        <span class="text-amber-400 font-semibold bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 text-[10px]">${log.rol}</span>
+                        <span class="text-slate-200">${log.descripcion}</span>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        // CAMBIO DE PESTAÑAS (FLUJO ESTRUCTURAL)
+        window.cambiarPestaña = function(pestaña) {
+            pestañaActual = pestaña;
+            const pestañasDisponibles = { 'auditoria': 'tab-auditoria', 'relleno': 'tab-relleno', 'super': 'tab-super' };
+
+            Object.keys(pestañasDisponibles).forEach(key => {
+                const btn = document.getElementById(pestañasDisponibles[key]);
+                if (btn) {
+                    if (key === pestaña) {
+                        btn.className = "flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold border transition bg-pink-600 text-white border-pink-600 shadow-sm";
+                    } else {
+                        btn.className = "flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold border transition text-slate-600 border-slate-200 bg-slate-50 hover:bg-slate-100";
+                    }
+                }
+            });
+
+            window.renderAll();
+        };
 
         // AGREGAR PRODUCTOS DINÁMICAMENTE
         window.agregarProductoManual = function(e) {
             if (e && e.preventDefault) e.preventDefault();
-
 
             if (rolUsuarioActual !== 'Coordinador General') {
                 alert("Acceso denegado. Solo los coordinadores generales pueden añadir productos.");
                 return;
             }
 
-
             const nombre = document.getElementById('add-nombre').value.trim();
             const categoria = document.getElementById('add-categoria').value.trim();
             const unidad = document.getElementById('add-unidad').value.trim();
             const ubicacion = document.getElementById('add-ubicacion').value;
             const stockObjetivo = parseInt(document.getElementById('add-objetivo').value);
-
 
             const nuevoProd = {
                 id: Date.now(),
@@ -285,60 +409,89 @@
                 unidad: unidad,
                 ubicacion: ubicacion,
                 stockObjetivo: stockObjetivo,
-                cantidadActual: 0
+                cantidadActual: 0,
+                agotadoGrande: false
             };
 
-
             inventario.push(nuevoProd);
+            window.registrarLogAccion(`Añadió el producto "${nombre}" al catálogo.`);
             window.renderAll();
             window.guardarSilencioso();
-
 
             document.getElementById('form-nuevo-producto').reset();
             window.showToast(`✨ ¡${nombre} guardado correctamente!`);
         };
 
-
-        // ELIMINAR PRODUCTOS (MÓDULO PROTEGIDO)
+        // ELIMINAR PRODUCTOS
         window.eliminarProducto = function(id, nombre) {
             if (rolUsuarioActual !== 'Coordinador General') {
                 alert("Acceso denegado. No tienes permisos para borrar productos.");
                 return;
             }
 
-
             if (confirm(`¿Estás seguro de que deseas eliminar por completo "${nombre}" del sistema?`)) {
                 inventario = inventario.filter(prod => prod.id !== id);
+                window.registrarLogAccion(`Eliminó el producto "${nombre}" del catálogo.`);
                 window.renderAll();
                 window.guardarSilencioso();
                 window.showToast(`🗑️ Producto "${nombre}" eliminado de la nube.`);
             }
         };
 
+        // GESTIÓN DE INCIDENCIAS MANUALES DE REABASTECIMIENTO (BOTONES PESTAÑA RELLENO)
+        window.marcarSurtidoCompleto = function(id, nombre, meta) {
+            const prod = inventario.find(p => p.id === id);
+            if (prod) {
+                prod.cantidadActual = meta; // Sube automáticamente hasta igualar el objetivo
+                window.registrarLogAccion(`Surtido exitoso: El stock en estante chico de "${nombre}" se igualó a su meta (${meta}).`);
+                window.renderAll();
+                window.guardarSilencioso();
+                window.showToast(`✔ "${nombre}" restablecido a su nivel óptimo.`);
+            }
+        };
+
+        window.marcarAgotadoEnGrande = function(id, nombre) {
+            const prod = inventario.find(p => p.id === id);
+            if (prod) {
+                prod.agotadoGrande = true; // Cambia el estado en el almacén central a agotado
+                window.registrarLogAccion(`Incidencia: Se marcó "${nombre}" como NO DISPONIBLE en Almacén Grande.`);
+                window.renderAll();
+                window.guardarSilencioso();
+                window.showToast(`⚠️ "${nombre}" reportado como agotado en bodega central.`);
+            }
+        };
+
+        // RESETEAR ESTADO DE AGOTADO EN GRANDE (OPCIÓN DE RECUPERACIÓN LOGÍSTICA)
+        window.rehabilitarEnGrande = function(id, nombre) {
+            const prod = inventario.find(p => p.id === id);
+            if (prod) {
+                prod.agotadoGrande = false;
+                window.registrarLogAccion(`Logística: Se reabasteció Almacén Grande con "${nombre}".`);
+                window.renderAll();
+                window.guardarSilencioso();
+                window.showToast(`📦 "${nombre}" disponible de nuevo en Almacén Grande.`);
+            }
+        };
 
         // MANEJADOR DE INICIO DE SESIÓN INTEGRANDO PINES DIFERENCIADOS
         window.handleLogin = async function(e) {
             if (e && e.preventDefault) e.preventDefault();
-
 
             const usuarioSel = document.getElementById('login-usuario').value;
             const pinIngresado = document.getElementById('login-pin').value;
            
             let pinValido = false;
            
-            // FILTRO DE CONTRASEÑAS POR ACCESO SELECTIVO
             if (usuarioSel === 'Encargado Almacén Chico' && pinIngresado === '1234') {
                 pinValido = true;
             } else if (usuarioSel === 'Coordinador General' && pinIngresado === '4321') {
                 pinValido = true;
             }
 
-
             if (pinValido) {
                 document.getElementById('login-error').classList.add('hidden');
                 localStorage.setItem('ras_usuario_actual', usuarioSel);
                 rolUsuarioActual = usuarioSel;
-
 
                 if (auth) {
                     try {
@@ -349,31 +502,25 @@
                     }
                 }
 
-
                 document.getElementById('usr-actual').innerText = usuarioSel;
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('app-screen').classList.remove('hidden');
                 document.getElementById('app-screen').classList.add('flex');
                
-                // Mostrar/Ocultar formulario según rol al ingresar
-                const panelAgregar = document.getElementById('panel-agregar-producto');
-                if (rolUsuarioActual === 'Coordinador General') {
-                    panelAgregar.classList.remove('hidden');
-                    window.showToast(`👑 Modo Coordinador: Permisos totales activos.`);
-                } else {
-                    panelAgregar.classList.add('hidden');
-                    window.showToast(`👋 Modo Encargado: Sincronización en tiempo real activa.`);
-                }
+                window.actualizarVisibilidadPanelesYBitacora();
+                window.registrarLogAccion("Inició sesión en el sistema.");
                
                 window.renderAll();
                 setTimeout(() => lucide.createIcons(), 100);
-
 
                 const productosRef = ref(dbRealtime, 'productos');
                 onValue(productosRef, (snapshot) => {
                     const datosNube = snapshot.val();
                     if (datosNube) {
-                        inventario = Object.values(datosNube).filter(Boolean);
+                        inventario = Object.values(datosNube).filter(Boolean).map(p => ({
+                            ...p,
+                            agotadoGrande: p.agotadoGrande !== undefined ? p.agotadoGrande : false
+                        }));
                         localStorage.setItem('inventario_ras', JSON.stringify(inventario));
                         window.renderAll();
                     }
@@ -383,8 +530,8 @@
             }
         };
 
-
         window.handleLogout = async function() {
+            window.registrarLogAccion("Cerró sesión.");
             try { await signOut(auth); } catch (e) {}
             localStorage.removeItem('ras_usuario_actual');
             localStorage.removeItem('inventario_ras');
@@ -393,29 +540,25 @@
             document.getElementById('login-screen').classList.remove('hidden');
         };
 
-
         window.guardarSilencioso = async function() {
             localStorage.setItem('inventario_ras', JSON.stringify(inventario));
             if (window.dbRealtimeInstance) {
                 try {
                     await set(ref(window.dbRealtimeInstance, 'productos'), inventario);
                 } catch (error) {
-                    console.error("Error en Firebase:", error);
+                    console.error("Error en Firebase Realtime:", error);
                 }
             }
         };
-
 
         window.handleBuscar = function() {
             textoBusquedaActual = document.getElementById('buscador').value.toLowerCase();
             window.renderAll();
         };
 
-
         window.filtrarEstante = function(estante) {
             filtroEstanteActual = estante;
             const botones = { 'todos': 'btn-estante-todos', 'Almacena (General)': 'btn-estante-general', 'Mueble de Madera': 'btn-estante-madera' };
-
 
             Object.keys(botones).forEach(key => {
                 const btn = document.getElementById(botones[key]);
@@ -430,7 +573,6 @@
             window.renderAll();
         };
 
-
         window.cambiarCantidad = function(id, factor) {
             const prod = inventario.find(p => p.id === id);
             if (prod) {
@@ -443,33 +585,61 @@
             }
         };
 
-
-        // RENDERIZADO CON CRITERIO DE ALERTAS Y PERMISOS DE SELECCIÓN
+        // RENDERIZADOR GENERAL DE TARJETAS Y CONEXIÓN REAL DE KPIs SUPERIORES
         window.renderAll = function() {
             const contenedor = document.getElementById('contenedor-productos');
             if (!contenedor) return;
             contenedor.innerHTML = '';
 
+            // 2. CONEXIÓN REAL DE LA TARJETA AMARILLA (CONTEO DE AGOTADOS EN GRANDE) Y INDICADORES
+            let contAlDia = 0;
+            let contFaltantesChico = 0;
+            let contAgotadoGrande = 0; // Acumulador reactivo en tiempo real
 
-            const productosFiltrados = inventario.filter(prod => {
+            inventario.forEach(p => {
+                if (p) {
+                    if (p.cantidadActual >= p.stockObjetivo) contAlDia++;
+                    if (p.cantidadActual === 0) contFaltantesChico++;
+                    
+                    // Suma dinámicamente si el producto fue marcado con "No hay en Grande" (agotadoGrande == true)
+                    if (p.agotadoGrande === true) {
+                        contAgotadoGrande++;
+                    }
+                }
+            });
+
+            // Inyección automática en los indicadores superiores del HTML
+            document.getElementById('kpi-al-dia').innerText = contAlDia;
+            document.getElementById('kpi-faltantes').innerText = contFaltantesChico;
+            document.getElementById('kpi-agotado-grande').innerText = contAgotadoGrande;
+
+            // Filtrado del catálogo según estante y buscador
+            let productosFiltrados = inventario.filter(prod => {
                 if (!prod) return false;
                 const cumpleEstante = (filtroEstanteActual === 'todos' || prod.ubicacion === filtroEstanteActual);
                 const cumpleBusqueda = prod.nombre.toLowerCase().includes(textoBusquedaActual) || prod.categoria.toLowerCase().includes(textoBusquedaActual);
                 return cumpleEstante && cumpleBusqueda;
             });
 
+            // Filtrado específico según la pestaña activa
+            if (pestañaActual === 'relleno') {
+                // Muestra solo los productos que necesitan reabastecimiento en el estante chico
+                productosFiltrados = productosFiltrados.filter(p => p.cantidadActual < p.stockObjetivo);
+            } else if (pestañaActual === 'super') {
+                // Muestra los productos marcados como agotados en la bodega central (orden de compra)
+                productosFiltrados = productosFiltrados.filter(p => p.agotadoGrande === true);
+            }
 
             if (productosFiltrados.length === 0) {
                 contenedor.innerHTML = `
                     <div class="col-span-full bg-white p-12 text-center text-slate-400 font-medium rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center gap-2">
                         <i data-lucide="package-open" class="w-8 h-8 text-slate-300"></i>
-                        No hay productos registrados.
+                        No hay productos que coincidan con los criterios de esta sección.
                     </div>
                 `;
                 lucide.createIcons();
                 return;
             }
-
 
             productosFiltrados.forEach(prod => {
                 const falta = Math.max(0, prod.stockObjetivo - prod.cantidadActual);
@@ -478,9 +648,7 @@
                 let badgeEstatus = '';
                 let estiloTarjetaExtra = '';
 
-
                 if (esCritico) {
-                    // Diseño Crítico: Fondo rosa suave y alerta parpadeante
                     badgeEstatus = `<span class="inline-flex items-center gap-1 bg-rose-100 text-rose-700 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-rose-200 animate-pulse"><i data-lucide="alert-triangle" class="w-3 h-3"></i> CRÍTICO: VACÍO</span>`;
                     estiloTarjetaExtra = "bg-rose-50/60 border-t-pink-600 alerta-vacio shadow-pink-100";
                 } else if (prod.cantidadActual < prod.stockObjetivo) {
@@ -491,14 +659,51 @@
                     estiloTarjetaExtra = "bg-white border-t-teal-500 shadow-sm";
                 }
 
-
-                // Ocultar botón eliminar si es Encargado Almacén Chico
                 const botonEliminarHTML = (rolUsuarioActual === 'Coordinador General') ? `
                     <button onclick="window.eliminarProducto(${prod.id}, '${prod.nombre}')" class="text-slate-300 hover:text-rose-600 p-1 rounded-lg hover:bg-rose-100 transition" title="Eliminar producto">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>
                 ` : '';
 
+                // Renderizado condicional de los controles según la pestaña seleccionada
+                let areaControlesAccionHTML = '';
+
+                if (pestañaActual === 'auditoria') {
+                    areaControlesAccionHTML = `
+                        <div class="flex items-center justify-between mt-5 pt-3 border-t border-slate-100">
+                            <span class="text-xs font-bold text-slate-400">Cantidad en Almacén</span>
+                            <div class="flex items-center gap-3">
+                                <button onclick="window.cambiarCantidad(${prod.id}, -1)" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold transition text-lg active:scale-90">-</button>
+                                <span class="w-6 text-center font-black text-lg text-slate-900">${prod.cantidadActual}</span>
+                                <button onclick="window.cambiarCantidad(${prod.id}, 1)" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold transition text-lg active:scale-90">+</button>
+                            </div>
+                        </div>
+                    `;
+                } else if (pestañaActual === 'relleno') {
+                    // 1. FLUJO DE RELLENO: Botones de Acción Manual de Surtido
+                    areaControlesAccionHTML = `
+                        <div class="flex flex-col gap-2 mt-5 pt-3 border-t border-slate-100">
+                            <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Acciones de Reabastecimiento:</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="window.marcarSurtidoCompleto(${prod.id}, '${prod.nombre}', ${prod.stockObjetivo})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2 px-2 rounded-xl transition flex items-center justify-center gap-1 shadow-sm active:scale-95">
+                                    <i data-lucide="check" class="w-3.5 h-3.5"></i> ✔ Surtido
+                                </button>
+                                <button onclick="window.marcarAgotadoEnGrande(${prod.id}, '${prod.nombre}')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-2 px-2 rounded-xl transition flex items-center justify-center gap-1 shadow-sm active:scale-95">
+                                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> ⚠️ No hay en Grande
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else if (pestañaActual === 'super') {
+                    // Controles de recuperación rápidos para la pestaña de lista súper
+                    areaControlesAccionHTML = `
+                        <div class="mt-5 pt-3 border-t border-slate-100">
+                            <button onclick="window.rehabilitarEnGrande(${prod.id}, '${prod.nombre}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs py-2 px-3 rounded-xl transition flex items-center justify-center gap-2">
+                                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Quitar de Faltantes (Reabastecido)
+                            </button>
+                        </div>
+                    `;
+                }
 
                 const tarjeta = document.createElement('div');
                 tarjeta.className = `p-5 rounded-2xl border border-slate-100 flex flex-col justify-between hover:shadow-md transition duration-200 border-t-4 relative ${estiloTarjetaExtra}`;
@@ -516,11 +721,12 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="text-[11px] bg-sky-50 text-sky-700 font-semibold px-2 py-0.5 rounded-md">${prod.ubicacion}</span>
+                            ${prod.agotadoGrande ? `<span class="text-[10px] bg-amber-500 text-white font-extrabold px-2 py-0.5 rounded-md tracking-wider animate-pulse">Agotado Grande</span>` : ''}
                         </div>
                         <div class="grid grid-cols-2 bg-slate-50 p-2.5 rounded-xl text-center text-xs font-semibold gap-2 border border-slate-100/50">
                             <div>
-                                <p class="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Objetivo</p>
-                                <p class="text-slate-700 font-extrabold text-sm mt-0.5">${prod.stockObjetivo}</p>
+                                <p class="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Meta Objetivo</p>
+                                <p class="text-slate-700 font-extrabold text-sm mt-0.5">${prod.stockObjetivo} ${prod.unidad}</p>
                             </div>
                             <div class="border-l border-slate-200">
                                 <p class="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Falta llevar</p>
@@ -528,31 +734,21 @@
                             </div>
                         </div>
                     </div>
-                   
-                    <div class="flex items-center justify-between mt-5 pt-3 border-t border-slate-100">
-                        <span class="text-xs font-bold text-slate-400">Cantidad en Almacén</span>
-                        <div class="flex items-center gap-3">
-                            <button onclick="window.cambiarCantidad(${prod.id}, -1)" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold transition text-lg active:scale-90">-</button>
-                            <span class="w-6 text-center font-black text-lg text-slate-900">${prod.cantidadActual}</span>
-                            <button onclick="window.cambiarCantidad(${prod.id}, 1)" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold transition text-lg active:scale-90">+</button>
-                        </div>
-                    </div>
+                    ${areaControlesAccionHTML}
                 `;
                 contenedor.appendChild(tarjeta);
             });
 
-
             lucide.createIcons();
         };
 
-
-        // GENERACIÓN DE REPORTES EN PDF
-        window.exportarPDF = function(tipo) {
+        // 3. MOTOR DE PDF TOTALMENTE REESTRUCTURADO EN 4 TABLAS TEMÁTICAS DE COLORES INDEPENDIENTES
+        window.exportarPDFEstructural = function() {
             const { jsPDF } = window.jspdf;
             const docPDF = new jsPDF('p', 'pt', 'a4');
             const fechaActual = new Date().toLocaleDateString('es-MX');
 
-
+            // Encabezado institucional del PDF
             docPDF.setFillColor(219, 39, 119);
             docPDF.rect(0, 0, 595, 75, 'F');
             docPDF.setTextColor(255, 255, 255);
@@ -561,68 +757,115 @@
             docPDF.text("FUNDACIÓN MOVIMIENTO RAS", 35, 34);
             docPDF.setFontSize(10);
             docPDF.setFont("helvetica", "normal");
-            docPDF.text("Sistema de Auditoría y Control de Doble Almacén", 35, 52);
-            docPDF.text(`Fecha: ${fechaActual}`, 480, 44);
-
-
-            let productosParaPDF = [...inventario].filter(Boolean);
-            if (tipo === 'chico') {
-                productosParaPDF = productosParaPDF.filter(p => (p.stockObjetivo - p.cantidadActual) > 0);
-            }
-
-
-            const productosVacios = productosParaPDF.filter(p => p.cantidadActual === 0);
-            const productosIncompletos = productosParaPDF.filter(p => p.cantidadActual > 0 && p.cantidadActual < p.stockObjetivo);
-            const productosLlenos = productosParaPDF.filter(p => p.cantidadActual >= p.stockObjetivo);
-
+            docPDF.text("Reporte de Auditoría Estructural e Indicadores Logísticos de Surtido", 35, 52);
+            docPDF.text(`Fecha: ${fechaActual}`, 470, 44);
 
             let coordenadaYActual = 110;
-            const columnasTabla = ["Producto / Categoría", "Ubicación", "Objetivo", "Actual", "Acción Requerida"];
 
+            // Helper modular interno para construir cada una de las 4 tablas solicitadas
+            function renderizarSeccionTablaPDF(titulo, listadoFilas, encabezadosColumnas, colorEncabezadoHex, usarTextoOscuroHead = false) {
+                if (listadoFilas.length === 0) return;
 
-            function construirSeccionTabla(tituloSeccion, listadoProductos, colorRGB) {
-                if (listadoProductos.length === 0) return;
+                // Verificación preventiva de desbordamiento de página
+                if (coordenadaYActual > 730) {
+                    docPDF.addPage();
+                    coordenadaYActual = 50;
+                }
+
+                // Subtítulo de la sección
                 docPDF.setFillColor(248, 250, 252);
                 docPDF.rect(35, coordenadaYActual - 15, 525, 22, 'F');
-                docPDF.setTextColor(colorRGB[0], colorRGB[1], colorRGB[2]);
+                docPDF.setTextColor(usarTextoOscuroHead ? "#1E293B" : colorEncabezadoHex);
                 docPDF.setFont("helvetica", "bold");
                 docPDF.setFontSize(11);
-                docPDF.text(tituloSeccion, 42, coordenadaYActual);
+                docPDF.text(titulo, 42, coordenadaYActual);
 
-
-                const filasDatos = listadoProductos.map(p => {
-                    const diferencia = p.stockObjetivo - p.cantidadActual;
-                    return [
-                        `${p.nombre}\n(${p.categoria})`, p.ubicacion, `${p.stockObjetivo} pzs`, `${p.cantidadActual} pzs`,
-                        diferencia > 0 ? `Faltan ${diferencia} ${p.unidad || 'pzs'}` : "Surtido Completo"
-                    ];
-                });
-
-
+                // Extensión jsPDF AutoTable
                 docPDF.autoTable({
-                    head: [columnasTabla], body: filasDatos, startY: coordenadaYActual + 8,
-                    margin: { left: 35, right: 35 }, theme: 'striped', styles: { fontSize: 9, cellPadding: 6 },
-                    headStyles: { fillColor: colorRGB, fontStyle: 'bold' },
-                    columnStyles: { 0: { cellWidth: 150 }, 1: { cellWidth: 120 }, 2: { cellWidth: 60, halign: 'center' }, 3: { cellWidth: 60, halign: 'center' }, 4: { cellWidth: 135, fontStyle: 'bold' } }
+                    head: [encabezadosColumnas],
+                    body: listadoFilas,
+                    startY: coordenadaYActual + 8,
+                    margin: { left: 35, right: 35 },
+                    theme: 'striped',
+                    styles: { fontSize: 9, cellPadding: 6, textColor: [30, 41, 59] },
+                    headStyles: { 
+                        fillColor: colorEncabezadoHex, 
+                        fontStyle: 'bold', 
+                        textColor: usarTextoOscuroHead ? [30, 41, 59] : [255, 255, 255] 
+                    }
                 });
+
                 coordenadaYActual = docPDF.lastAutoTable.finalY + 35;
             }
 
+            // --- FILTRADO Y MAPEO DE LOS CONJUNTOS DE DATOS ---
 
-            construirSeccionTabla("1. ESTANTES COMPLETAMENTE VACÍOS (CRÍTICO)", productosVacios, [219, 39, 119]);
-            construirSeccionTabla("2. PRODUCTOS CON STOCK INSUFICIENTE (POR SURTIR)", productosIncompletos, [217, 119, 6]);
-            if (tipo === 'general') {
-                construirSeccionTabla("3. PRODUCTOS CON INVENTARIO ÓPTIMO", productosLlenos, [2, 132, 199]);
-            }
+            // Tabla 1: Todos los productos (Morado - #8E44AD)
+            const filasTabla1 = inventario.map(p => [
+                p.nombre, p.categoria, p.ubicacion, `${p.stockObjetivo} ${p.unidad}`, `${p.cantidadActual} ${p.unidad}`, p.agotadoGrande ? "AGOTADO" : "DISPONIBLE"
+            ]);
 
+            // Tabla 2: Solo productos en 0 en almacén chico (Azul - #2980B9)
+            const productosFaltantesChico = inventario.filter(p => p.cantidadActual === 0);
+            const filasTabla2 = productosFaltantesChico.map(p => [
+                p.nombre, p.categoria, p.ubicacion, `${p.stockObjetivo} ${p.unidad}`, "0 piezas (Crítico)"
+            ]);
 
-            docPDF.setFontSize(8); docPDF.setTextColor(148, 163, 184);
-            docPDF.text("Este reporte fue generado de forma automatizada por el Sistema de Inventario Movimiento RAS.", 35, 810);
+            // Tabla 3: Solo productos marcados con 'No hay en Grande' (Amarillo - #F1C40F)
+            const productosAgotadosGrande = inventario.filter(p => p.agotadoGrande === true);
+            const filasTabla3 = productosAgotadosGrande.map(p => [
+                p.nombre, p.categoria, p.ubicacion, "SIN EXISTENCIAS CENTRALES"
+            ]);
+
+            // Tabla 4: Lista Limpia para Proveedores/Compras (Rosa - #E91E63)
+            const filasTabla4 = productosAgotadosGrande.map(p => [
+                p.nombre, p.categoria, "Orden de Reabastecimiento Inmediata"
+            ]);
+
+            // --- EJECUCIÓN SUCESIVA DE LAS 4 SECCIONES REQUERIDAS ---
+
+            // Tabla 1: MORADA
+            renderizarSeccionTablaPDF(
+                "Tabla 1: Inventario General (Todos los Productos)",
+                filasTabla1,
+                ["Nombre del Artículo", "Categoría", "Estante Asignado", "Meta Chico", "Existencia Chico", "Estatus Grande"],
+                "#8E44AD"
+            );
+
+            // Tabla 2: AZUL
+            renderizarSeccionTablaPDF(
+                "Tabla 2: Productos Faltantes - Estante Chico (En Cero)",
+                filasTabla2,
+                ["Nombre del Artículo", "Categoría", "Estante Asignado", "Meta Requerida", "Estatus Crítico"],
+                "#2980B9"
+            );
+
+            // Tabla 3: AMARILLA (Con texto oscuro en encabezado para legibilidad física)
+            renderizarSeccionTablaPDF(
+                "Tabla 3: Productos Faltantes - Estante Grande (Incidencias)",
+                filasTabla3,
+                ["Nombre del Artículo", "Categoría", "Ubicación Geográfica", "Incidencia Registrada"],
+                "#F1C40F",
+                true
+            );
+
+            // Tabla 4: ROSA
+            renderizarSeccionTablaPDF(
+                "Tabla 4: Lista para Comprar - Estante Grande (Proveedores)",
+                filasTabla4,
+                ["Insumo Solicitado", "Segmento / Categoría", "Instrucciones de Adquisición"],
+                "#E91E63"
+            );
+
+            // Pie de página institucional
+            docPDF.setFontSize(8); 
+            docPDF.setTextColor(148, 163, 184);
+            docPDF.text("Este reporte estructural fue emitido de forma automatizada por el Sistema de Control de Inventario Movimiento RAS.", 35, 815);
+            
             const nombreLimpioFecha = fechaActual.replace(/\//g, '-');
-            docPDF.save(`Reporte_Inventario_RAS_${tipo}_${nombreLimpioFecha}.pdf`);
-            window.showToast("📄 Reporte en PDF generado con éxito.");
+            docPDF.save(`Reporte_Estructural_4Tablas_RAS_${nombreLimpioFecha}.pdf`);
+            window.showToast("📄 Reporte estructural de 4 tablas generado con éxito.");
         };
-
 
         // NOTIFICACIONES TOAST
         window.showToast = function(mensaje) {
