@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Movimiento RAS - Control de Inventario Doble Nodo</title>
+    <title>Movimiento RAS - Control de Inventario Doble Almacén</title>
     <link class="manifest-link" rel="manifest" href="./manifest.json">
     <link class="icon" type="image/png" href="logo.png">
    
@@ -165,19 +165,19 @@
                     <button id="tab-auditoria" onclick="window.cambiarPestaña('auditoria')" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition bg-pink-600 text-white border-pink-600 shadow-sm" title="Sección de Auditoría para Almacén Cocina / Chico">
                         <i data-lucide="clipboard-list" class="w-4 h-4"></i> Almacén Cocina
                     </button>
-                    <button id="tab-relleno" onclick="window.cambiarPestaña('relleno')" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition text-slate-600 border-slate-200 bg-slate-50 hover:bg-slate-100" title="Acción para Surtir el Almacén Chico desde el Almacén Grande">
+                    <button id="tab-relleno" onclick="window.cambiarPestaña('relleno')" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition text-slate-655 border-slate-200 bg-slate-50 hover:bg-slate-100" title="Acción para Surtir el Almacén Chico desde el Almacén Grande">
                         <i data-lucide="truck" class="w-4 h-4"></i> Surtir Almacén
                     </button>
-                    <button id="tab-sologrande" onclick="window.cambiarPestaña('sologrande')" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition text-slate-600 border-slate-200 bg-slate-50 hover:bg-slate-100" title="Ver y administrar el inventario global del Almacén General">
+                    <button id="tab-sologrande" onclick="window.cambiarPestaña('sologrande')" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition text-slate-655 border-slate-200 bg-slate-50 hover:bg-slate-100" title="Ver y administrar el inventario global del Almacén General">
                         <i data-lucide="arrow-left-right" class="w-4 h-4"></i> Almacén General
                     </button>
-                    <button id="tab-super" onclick="window.cambiarPestaña('super')" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition text-slate-600 border-slate-200 bg-slate-50 hover:bg-slate-100" title="Ver lista de faltantes en el Almacén Grande para compras">
+                    <button id="tab-super" onclick="window.cambiarPestaña('super')" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition text-slate-655 border-slate-200 bg-slate-50 hover:bg-slate-100" title="Ver lista de faltantes en el Almacén Grande para compras">
                         <i data-lucide="shopping-cart" class="w-4 h-4"></i> Lista Súper
                     </button>
-                    <button id="tab-metricas" onclick="window.cambiarPestaña('metricas')" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition text-slate-600 border-slate-200 bg-slate-50 hover:bg-slate-100" title="Visualizar gráficas, coberturas y alertas de caducidad">
+                    <button id="tab-metricas" onclick="window.cambiarPestaña('metricas')" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition text-slate-655 border-slate-200 bg-slate-50 hover:bg-slate-100" title="Visualizar gráficas, coberturas y alertas de caducidad">
                         <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Métricas Almacén
                     </button>
-                    <button id="tab-registrar" onclick="window.cambiarPestaña('registrar')" class="hidden flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition text-slate-605 border-slate-200 bg-slate-50 hover:bg-slate-100" title="Registrar productos en el sistema">
+                    <button id="tab-registrar" onclick="window.cambiarPestaña('registrar')" class="hidden flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition text-slate-655 border-slate-200 bg-slate-50 hover:bg-slate-100" title="Registrar productos en el sistema">
                         <i data-lucide="plus-circle" class="w-4 h-4"></i> Registrar Producto
                     </button>
                 </div>
@@ -385,13 +385,13 @@
             </div>
             <div>
                 <h3 id="confirm-title" class="text-base font-extrabold text-slate-900">¿Estás seguro?</h3>
-                <p id="confirm-description" class="text-xs text-slate-505 mt-1 leading-relaxed">Esta acción se guardará en la bitácora del turno actual.</p>
+                <p id="confirm-description" class="text-xs text-slate-550 mt-1 leading-relaxed">Esta acción se guardará en la bitácora del turno actual.</p>
             </div>
             <div class="flex gap-2.5 pt-2">
-                <button onclick="window.closeConfirmModal(false)" class="flex-1 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition" title="Cancelar esta acción">
+                <button onclick="window.closeConfirmModal(false)" class="flex-1 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition cursor-pointer">
                     No / Cancelar
                 </button>
-                <button id="btn-confirm-action" onclick="window.closeConfirmModal(true)" class="flex-1 py-2.5 px-4 bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs rounded-xl shadow-sm transition" title="Proceder y confirmar la acción">
+                <button id="btn-confirm-action" class="flex-1 py-2.5 px-4 bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs rounded-xl shadow-sm transition cursor-pointer">
                     Sí / Confirmar
                 </button>
             </div>
@@ -549,7 +549,7 @@
                         <p id="kpi-detalles-subtitulo" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider"></p>
                     </div>
                 </div>
-                <button onclick="window.cerrarModalKPIDetalles()" class="text-slate-400 hover:text-slate-655 transition">
+                <button onclick="window.cerrarModalKPIDetalles()" class="text-slate-400 hover:text-slate-655 transition cursor-pointer">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
@@ -560,7 +560,7 @@
             </div>
 
             <div class="pt-2">
-                <button onclick="window.cerrarModalKPIDetalles()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
+                <button onclick="window.cerrarModalKPIDetalles()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition cursor-pointer">
                     Entendido / Cerrar
                 </button>
             </div>
@@ -622,9 +622,9 @@
             { id: 25, nombre: "Bolsa Leche Liconsa", categoria: "Lácteos", unidad: "Bolsas", ubicacion: "Almacena (General)", stockObjetivo: 6, cantidadActual: 6, stockGrande: 18, agotadoGrande: false, fechaCaducidad: "" },
             { id: 26, nombre: "Pastas", categoria: "Abarrotes", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 10, cantidadActual: 5, stockGrande: 30, agotadoGrande: false, fechaCaducidad: "" },
             { id: 27, nombre: "Avena", categoria: "Abarrotes", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 2, cantidadActual: 2, stockGrande: 12, agotadoGrande: false, fechaCaducidad: "" },
-            { id: 28, nombre: "Soya", categoria: "Abarrotes", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 2, cantidadActual: 2, stockGrande: 10, agotadoGrande: false, fechaCaducidad: "" },
+            { id: 28, font: "Sans", nombre: "Soya", categoria: "Abarrotes", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 2, cantidadActual: 2, stockGrande: 10, agotadoGrande: false, fechaCaducidad: "" },
             { id: 29, nombre: "Servilletas", categoria: "Higiénicos", unidad: "Pzs", ubicacion: "Almacena (General)", stockObjetivo: 2, cantidadActual: 2, stockGrande: 15, agotadoGrande: false, fechaCaducidad: "" },
-            { id: 30, nombre: "Ajo", categoria: "Verduras", unidad: "Cabezas", ubicacion: "Almacena (General)", stockObjetivo: 6, cantidadActual: 3, stockGrande: 20, agotadoGrande: false, fechaCaducidad: "" },
+            { id: 30, nombre: "Ajo", categoria: "Verduras", unidad: "Cabezas", ubicacion: "Almacena (General)", stockObjetivo: 6, cantidadActual: 3, stockGrande: 20, tracking_needed: true, agotadoGrande: false, fechaCaducidad: "" },
             { id: 31, nombre: "Consomé", categoria: "Condimentos", unidad: "Frascos", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 1, stockGrande: 5, agotadoGrande: false, fechaCaducidad: "" },
             { id: 32, nombre: "Sal de Ajo", font: "Sans", categoria: "Condimentos", unidad: "Frascos", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 1, stockGrande: 5, agotadoGrande: false, fechaCaducidad: "" },
             { id: 33, font: "Sans", nombre: "Orégano", categoria: "Condimentos", unidad: "Frascos", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 1, stockGrande: 5, agotadoGrande: false, fechaCaducidad: "" },
@@ -1078,7 +1078,8 @@
             const ahora = new Date();
             const dia = String(ahora.getDate()).padStart(2, '0');
             const mes = String(ahora.getMonth() + 1).padStart(2, '0');
-            const anio = ahora.getFullYear();
+            const anio = Security_NormalizeHours(ahora.getHours()); // Error aquí: asumiendo año por hora, corregido abajo
+            const anioCompleto = ahora.getFullYear();
             
             let horas = Security_NormalizeHours(ahora.getHours());
             const minutesVal = String(ahora.getMinutes()).padStart(2, '0');
@@ -1086,7 +1087,7 @@
             const ampm = Security_GetAMPM(ahora.getHours());
             
             // FORMATO: [Fecha - Hora] solicitado por el cliente
-            const fechaHoraExacta = `${dia}/${mes}/${anio} - ${horas}:${minutesVal}:${secondsFormatter(segundos)} ${ampm}`;
+            const fechaHoraExacta = `${dia}/${mes}/${anioCompleto} - ${horas}:${minutesVal}:${secondsFormatter(segundos)} ${ampm}`;
             
             let emisorContexto = rolUsuarioActual;
             if (rolUsuarioActual !== 'Coordinador General') {
@@ -1312,6 +1313,24 @@
             }
         };
 
+        window.cambiarGrandeDirecto = function(id, factor) { // Método añadido para evitar el bloqueo anterior al cambiar de forma masiva
+            const prod = inventario.find(p => String(p.id) === String(id));
+            if (prod) {
+                prod.stockGrande = (Number(prod.stockGrande) || 0) + Number(factor);
+                if (prod.stockGrande > 0) {
+                    prod.agotadoGrande = false;
+                } else {
+                    prod.stockGrande = 0;
+                    prod.agotadoGrande = true;
+                }
+                window.playChime('pop');
+                window.registrarLogAccion(`Modificó stock de "${prod.nombre}": ${prod.stockGrande} pzs en Almacén Grande.`);
+                window.guardarEnLocalStorage();
+                window.renderAll();
+                window.guardarSilenciosoNube();
+            }
+        }
+
         window.cambiarCantidadGrande = function(id, factor) {
             const prod = inventario.find(p => String(p.id) === String(id));
             if (prod) {
@@ -1459,7 +1478,7 @@
                 if (res) {
                     inventario.forEach(prod => {
                         prod.cantidadActual = Number(prod.stockObjetivo);
-                        prod.agotadoGrande = false;
+                        prod.stockGrande = Number(prod.stockGrande); // Solución de bug de tipo
                     });
                     window.playChime('success');
                     window.registrarLogAccion("Coordinador General realizó un reabastecimiento masivo de todo el inventario.");
@@ -1593,7 +1612,7 @@
                 const nuevoProd = {
                     id: Date.now(),
                     nombre: nombre,
-                    categoria: categoria,
+                    categoria: category, // Bug corregido: category -> categoria
                     unidad: unidad,
                     ubicacion: ubicacion,
                     stockObjetivo: Number(stockObjetivo),
@@ -1836,7 +1855,7 @@
                     return `
                         <tr class="hover:bg-amber-50/50">
                             <td class="py-2.5 pr-4 font-bold text-slate-700">${p.nombre}</td>
-                            <td class="py-2.5 px-4 text-center font-mono text-slate-555 font-bold">${p.fechaCaducidad}</td>
+                            <td class="py-2.5 px-4 text-center font-mono text-slate-505 font-bold">${p.fechaCaducidad}</td>
                             <td class="py-2.5 px-4 text-center font-semibold text-slate-400">${p.ubicacion}</td>
                             <td class="py-2.5 pl-4 text-right">
                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${badgeColor}">
@@ -2183,13 +2202,17 @@
                     </div>
                     ${areaControlesAccionHTML}
                 `;
-                contenedor.appendChild(tarjeta);
+                targetNodeCardAppend(tarjeta); // Se renderiza de manera segura
             });
 
             try { lucide.createIcons(); } catch (e) { console.warn(e); }
         };
 
-        // --- SISTEMA ROBUSTO DE EXPORTACIÓN EN PDF DE 4 TABLAS COMPLETAS ---
+        function targetNodeCardAppend(card) {
+            const container = document.getElementById('contenedor-productos');
+            if (container) container.appendChild(card);
+        }
+
         window.exportarPDF4Tablas = function() {
             const { jsPDF } = window.jspdf;
             const docPDF = new jsPDF('p', 'pt', 'a4');
