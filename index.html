@@ -7,7 +7,6 @@
     <link class="manifest-link" rel="manifest" href="./manifest.json">
     <link class="icon" type="image/png" href="logo.png">
    
-    <!-- STREAMING_CHUNK: Inicializando hojas de estilo y Tailwind CSS... -->
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -178,7 +177,7 @@
                     <button id="tab-metricas" onclick="window.cambiarPestaña('metricas')" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition text-slate-600 border-slate-200 bg-slate-50 hover:bg-slate-100" title="Visualizar gráficas, coberturas y alertas de caducidad">
                         <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Métricas Almacén
                     </button>
-                    <button id="tab-registrar" onclick="window.cambiarPestaña('registrar')" class="hidden flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition text-slate-600 border-slate-200 bg-slate-50 hover:bg-slate-100" title="Registrar productos en el sistema">
+                    <button id="tab-registrar" onclick="window.cambiarPestaña('registrar')" class="hidden flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition text-slate-605 border-slate-200 bg-slate-50 hover:bg-slate-100" title="Registrar productos en el sistema">
                         <i data-lucide="plus-circle" class="w-4 h-4"></i> Registrar Producto
                     </button>
                 </div>
@@ -220,7 +219,7 @@
                     </div>
                 </div>
                 <div onclick="window.verDetallesKPI('agotado_grande')" class="bg-amber-50/70 border border-amber-100 p-4 rounded-2xl flex items-center gap-3 shadow-sm cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-md active:scale-95 select-none" title="Haz clic para ver la lista de insumos agotados en Almacén Grande">
-                    <div class="bg-amber-505 text-white p-3 rounded-xl shadow-inner">
+                    <div class="bg-amber-500 text-white p-3 rounded-xl shadow-inner">
                         <i data-lucide="alert-circle" class="w-5 h-5"></i>
                     </div>
                     <div>
@@ -230,19 +229,12 @@
                 </div>
             </div>
 
-            <!-- REGISTRAR PRODUCTO PANEL (SITUADO COMO PESTAÑA PRINCIPAL) -->
+            <!-- REGISTRAR PRODUCTO PANEL (SOLO PARA AGREGAR NUEVOS) -->
             <div id="panel-agregar-producto" class="hidden bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                     <div class="flex items-center gap-2 text-pink-600 font-extrabold text-sm uppercase tracking-wider">
-                        <i data-lucide="plus-circle" class="w-4 h-4" id="form-icon-header"></i>
-                        <span id="form-panel-title">Registrar / Editar Producto <span class="text-[10px] bg-pink-100 text-pink-700 px-2 py-0.5 rounded-md ml-1">Admin</span></span>
-                    </div>
-                    <!-- CONTROLES ADICIONALES MOVIDOS DIRECTAMENTE AQUÍ -->
-                    <div class="flex flex-wrap items-center gap-2">
-                        <!-- BOTÓN CANCELAR EDICIÓN -->
-                        <button id="btn-cancelar-edicion" onclick="window.cancelarEdicionFormulario()" class="hidden bg-slate-500 hover:bg-slate-600 text-white font-extrabold text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-xl transition shadow-sm active:scale-[0.97]" title="Cancelar la edición del producto seleccionado">
-                            Cancelar Edición
-                        </button>
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>Registrar Nuevo Producto <span class="text-[10px] bg-pink-100 text-pink-700 px-2 py-0.5 rounded-md ml-1 font-bold">Admin</span></span>
                     </div>
                 </div>
                 <!-- FORM GRID RESPONSIVA -->
@@ -399,7 +391,7 @@
                 <button onclick="window.closeConfirmModal(false)" class="flex-1 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition" title="Cancelar esta acción">
                     No / Cancelar
                 </button>
-                <button id="btn-confirm-action" class="flex-1 py-2.5 px-4 bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs rounded-xl shadow-sm transition" title="Proceder y confirmar la acción">
+                <button id="btn-confirm-action" onclick="window.closeConfirmModal(true)" class="flex-1 py-2.5 px-4 bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs rounded-xl shadow-sm transition" title="Proceder y confirmar la acción">
                     Sí / Confirmar
                 </button>
             </div>
@@ -419,10 +411,10 @@
                 <input type="number" id="prompt-input-value" value="50" min="1" class="w-full px-4 py-2 text-center bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 text-lg font-bold" title="Ingresa un valor numérico para la entrada">
             </div>
             <div class="flex gap-2.5 pt-2">
-                <button onclick="window.closePromptModal(false)" class="flex-1 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition" title="Cancelar registro">
+                <button onclick="window.closePromptModal(false)" class="flex-1 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition cursor-pointer">
                     Cancelar
                 </button>
-                <button id="btn-prompt-action" class="flex-1 py-2.5 px-4 bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs rounded-xl shadow-sm transition" title="Aceptar el valor e ingresarlo">
+                <button id="btn-prompt-action" onclick="window.closePromptModal(true)" class="flex-1 py-2.5 px-4 bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs rounded-xl shadow-sm transition cursor-pointer">
                     Aceptar
                 </button>
             </div>
@@ -468,7 +460,7 @@
             </div>
 
             <div class="pt-2">
-                <button onclick="window.closeHelpModal()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition" title="Cerrar y volver a la app">
+                <button onclick="window.closeHelpModal()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
                     Entendido, ¡gracias!
                 </button>
             </div>
@@ -533,10 +525,10 @@
                 </div>
 
                 <div class="flex gap-2.5 pt-3 border-t border-slate-100">
-                    <button type="button" onclick="window.cerrarModalEditar()" class="flex-1 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition" title="Cancelar cambios">
+                    <button type="button" onclick="window.cerrarModalEditar()" class="flex-1 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
                         Cancelar
                     </button>
-                    <button type="submit" class="flex-1 py-2.5 px-4 bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs rounded-xl shadow-sm transition" title="Aplicar los cambios al producto">
+                    <button type="submit" class="flex-1 py-2.5 px-4 bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs rounded-xl shadow-sm transition">
                         Guardar Cambios
                     </button>
                 </div>
@@ -557,7 +549,7 @@
                         <p id="kpi-detalles-subtitulo" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider"></p>
                     </div>
                 </div>
-                <button onclick="window.cerrarModalKPIDetalles()" class="text-slate-400 hover:text-slate-655 transition" title="Cerrar detalles">
+                <button onclick="window.cerrarModalKPIDetalles()" class="text-slate-400 hover:text-slate-655 transition">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
@@ -642,7 +634,7 @@
             { id: 37, nombre: "Knor Tomate", categoria: "Condimentos", unidad: "Cubitos", ubicacion: "Almacena (General)", stockObjetivo: 10, cantidadActual: 2, stockGrande: 30, agotadoGrande: false, fechaCaducidad: "" },
             { id: 38, nombre: "Knor Res", font: "Sans", categoria: "Condimentos", unidad: "Cubitos", ubicacion: "Almacena (General)", stockObjetivo: 10, cantidadActual: 2, stockGrande: 30, agotadoGrande: false, fechaCaducidad: "" },
             { id: 39, nombre: "Aceite Aguacate", categoria: "Abarrotes", unidad: "Botellas", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 1, stockGrande: 5, agotadoGrande: false, fechaCaducidad: "" },
-            { id: 40, nombre: "Aceite Spray Oliva", categoria: "Abarrotes", unidad: "Botes", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 1, stockGrande: 4, agotadoGrande: false, fechaCaducidad: "" },
+            { id: 40, font: "Sans", nombre: "Aceite Spray Oliva", categoria: "Abarrotes", unidad: "Botes", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 1, stockGrande: 4, agotadoGrande: false, fechaCaducidad: "" },
             { id: 41, nombre: "Polvo para Hornear", categoria: "Abarrotes", unidad: "Botes", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 3, stockGrande: 6, agotadoGrande: false, fechaCaducidad: "" },
             { id: 42, font: "Sans", font: "Sans", nombre: "Vainilla", categoria: "Condimentos", unidad: "Botellas", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 2, stockGrande: 8, agotadoGrande: false, fechaCaducidad: "" },
             { id: 43, nombre: "Paprika", categoria: "Condimentos", unidad: "Botes", ubicacion: "Almacena (General)", stockObjetivo: 1, cantidadActual: 1, stockGrande: 5, agotadoGrande: false, fechaCaducidad: "" },
@@ -893,6 +885,12 @@
         async function inicializarEstructura() {
             window.verificarRolSeleccionado();
             
+            // Colocar la fecha actual dinámica
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const fechaTxt = new Date().toLocaleDateString('es-MX', dateOptions);
+            const fechaHeader = document.getElementById('fecha-actual-header');
+            if (fechaHeader) fechaHeader.innerText = fechaTxt.charAt(0).toUpperCase() + fechaTxt.slice(1);
+
             if (modoLocal) {
                 window.usarModoLocal();
                 
@@ -1189,7 +1187,7 @@
                     if (key === pestaña) {
                         btn.className = "flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition bg-pink-600 text-white border-pink-600 shadow-sm";
                     } else {
-                        btn.className = "flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition text-slate-600 border-slate-200 bg-slate-50 hover:bg-slate-100";
+                        btn.className = "flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition text-slate-655 border-slate-200 bg-slate-50 hover:bg-slate-100";
                     }
                 }
             });
@@ -1262,7 +1260,7 @@
                     if (key === estante) {
                         btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition bg-pink-600 text-white shadow-sm";
                     } else {
-                        btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition text-slate-600 hover:text-sky-600";
+                        btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition text-slate-655 hover:text-sky-600";
                     }
                 }
             });
@@ -1305,7 +1303,7 @@
                     // Si el factor es menor a 0 (Disminuye stock en Chico), se asume consumo directo
                     prod.cantidadActual += numericFactor;
                     window.playChime('pop');
-                    window.registrarLogAccion(`Modificó stock de "${prod.nombre}": ${prod.cantidadActual} pzs en Almacén Cocina.`);
+                    window.registrarLogAccion(`Modificó stock de "${prod.nombre}": ${prod.cantidadActual} pzs en Almacén Chico.`);
                 }
 
                 window.guardarEnLocalStorage();
@@ -1371,7 +1369,7 @@
                             prod.agotadoGrande = false;
                             window.registrarLogAccion(`Entrada de Suministro: Se ingresaron ${qty} pzs a Almacén Grande de "${nombre}".`);
                             
-                            // Procedemos a surtir el Almacén Cocina con el nuevo stock disponible
+                            // Procedemos a surtir el Almacén Chico con el nuevo stock disponible
                             piezasFaltantes = targetMeta - prod.cantidadActual;
                             if (prod.stockGrande >= piezasFaltantes) {
                                 prod.stockGrande -= piezasFaltantes;
@@ -1379,7 +1377,7 @@
                                 prod.agotadoGrande = (prod.stockGrande <= 0);
                                 window.playChime('success');
                                 window.registrarLogAccion(`Surtido Completo (Posterior a Entrada): Se enviaron ${piezasFaltantes} pzs a Almacén Cocina para "${nombre}".`);
-                                window.showToast(`✔ ¡Almacén Grande reabastecido y Almacén Cocina surtido al 100%!`);
+                                window.showToast(`✔ ¡Almacén Grande reabastecido y Almacén Chico surtido al 100%!`);
                             } else {
                                 // En caso de que se haya ingresado una cantidad menor a la requerida
                                 let disponible = prod.stockGrande;
@@ -1816,7 +1814,7 @@
                     return;
                 }
 
-                docPDF.caducidadBody.innerHTML = itemsConCaducidad.map(p => {
+                caducidadBody.innerHTML = itemsConCaducidad.map(p => {
                     const fCad = new Date(p.fechaCaducidad);
                     const diffTime = fCad - hoy;
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -1838,7 +1836,7 @@
                     return `
                         <tr class="hover:bg-amber-50/50">
                             <td class="py-2.5 pr-4 font-bold text-slate-700">${p.nombre}</td>
-                            <td class="py-2.5 px-4 text-center font-mono text-slate-505 font-bold">${p.fechaCaducidad}</td>
+                            <td class="py-2.5 px-4 text-center font-mono text-slate-555 font-bold">${p.fechaCaducidad}</td>
                             <td class="py-2.5 px-4 text-center font-semibold text-slate-400">${p.ubicacion}</td>
                             <td class="py-2.5 pl-4 text-right">
                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${badgeColor}">
@@ -2242,29 +2240,24 @@
                 coordenadaYActual = docPDF.lastAutoTable.finalY + 35;
             }
 
-            // TABLA 1: Inventario Completo
             const filasT1 = inventario.map(p => [
                 p.nombre, p.categoria, p.ubicacion, `${p.stockObjetivo} ${p.unidad}`, `${p.cantidadActual} ${p.unidad}`, `${p.stockGrande} ${p.unidad}`, p.fechaCaducidad || '—'
             ]);
 
-            // TABLA 2: Faltantes Almacén Cocina
             const faltantesChicoCero = inventario.filter(p => p.stockObjetivo > 0 && p.cantidadActual <= 0);
             const filasT2 = faltantesChicoCero.map(p => [
                 p.nombre, p.categoria, p.ubicacion, `${p.stockObjetivo} ${p.unidad}`, `${p.cantidadActual} pzs`
             ]);
 
-            // TABLA 3: Agotados en Almacén Grande
             const faltantesGrandeMarcados = inventario.filter(p => p.stockGrande <= 0 || p.agotadoGrande === true);
             const filasT3 = faltantesGrandeMarcados.map(p => [
                 p.nombre, p.categoria, p.ubicacion, `STOCK ACTUAL: ${p.stockGrande} pzs`
             ]);
 
-            // TABLA 4: Lista para Comprar Almacén Grande (Formato Proveedor)
             const filasT4 = faltantesGrandeMarcados.map(p => [
                 p.nombre, p.categoria, "Orden de Adquisición Urgente para Proveedor"
             ]);
 
-            // Inyectamos las 4 tablas estructuradamente al documento PDF
             inyectarTablaModularPDF(
                 "Tabla 1: Inventario General (Todos los Productos del Sistema)",
                 filasT1,
